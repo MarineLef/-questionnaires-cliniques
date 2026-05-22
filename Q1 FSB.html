@@ -1,0 +1,2031 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Questionnaire 1 — Structure de fonctionnement de base</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js">
+function copyResults() {
+  const el = document.getElementById('emailBody');
+  if (!el) return;
+  const text = el.value;
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(() => {
+      document.getElementById('copyConfirm').style.display = 'block';
+      document.getElementById('btnCopy').textContent = '✓ Copié';
+    }).catch(() => fallbackCopy(text));
+  } else {
+    fallbackCopy(text);
+  }
+}
+function fallbackCopy(text) {
+  const el = document.getElementById('emailBody');
+  el.style.display = 'block';
+  el.select();
+  try {
+    document.execCommand('copy');
+    document.getElementById('copyConfirm').style.display = 'block';
+    document.getElementById('btnCopy').textContent = '✓ Copié';
+  } catch(e) {
+    el.style.display = 'block';
+    el.focus();
+    el.select();
+  }
+}
+
+</script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    color: #1a1a1a;
+    background: #f5f3f0;
+    padding: 20px;
+  }
+  .container {
+    max-width: 820px;
+    margin: 0 auto;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    overflow: hidden;
+  }
+  .header {
+    background: #3B6D11;
+    color: #fff;
+    padding: 32px 40px 24px;
+  }
+  .header h1 { font-size: 21px; font-weight: 600; margin-bottom: 4px; }
+  .header .subtitle { font-size: 13px; opacity: 0.80; margin-top: 4px; font-style: italic; }
+  .header .step-badge {
+    display: inline-block;
+    margin-top: 12px;
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 100px;
+    padding: 3px 14px;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .intro-box {
+    background: #EAF3DE;
+    border-left: 4px solid #639922;
+    margin: 24px 40px 0;
+    padding: 14px 18px;
+    border-radius: 6px;
+    font-size: 13.5px;
+    color: #173404;
+    line-height: 1.7;
+  }
+  .intro-box strong {
+    display: block; font-size: 13px; font-weight: 700;
+    color: #3B6D11; margin-bottom: 6px;
+    text-transform: uppercase; letter-spacing: 0.04em;
+  }
+  .consigne {
+    background: #f5faf0;
+    border-left: 4px solid #97C459;
+    margin: 16px 40px 0;
+    padding: 14px 18px;
+    border-radius: 6px;
+    font-size: 13.5px;
+    color: #27500A;
+    line-height: 1.6;
+  }
+  .consigne strong {
+    display: block; font-size: 13px; font-weight: 700;
+    color: #3B6D11; margin-bottom: 6px;
+    text-transform: uppercase; letter-spacing: 0.04em;
+  }
+  .completion-bar-wrap {
+    background: #EAF3DE; border-radius: 20px;
+    height: 8px; margin: 20px 40px 0; overflow: hidden;
+  }
+  .completion-bar { height: 100%; background: #639922; border-radius: 20px; transition: width 0.3s; width: 0%; }
+  .completion-label { font-size: 12px; color: #888; text-align: right; padding: 4px 40px 0; margin-bottom: 16px; }
+  .section { padding: 0 40px 30px; }
+  .question-block {
+    margin-bottom: 14px; padding: 13px 16px;
+    background: #fafaf8; border: 1px solid #e8e8e4;
+    border-radius: 8px; border-left: 3px solid #e8e8e4;
+    transition: border-left-color 0.2s;
+  }
+  .question-block.answered { border-left-color: #639922; }
+  .question-text { font-size: 14px; color: #1a1a1a; margin-bottom: 11px; line-height: 1.5; }
+  .question-num { font-weight: 700; color: #3B6D11; }
+  .radio-group { display: flex; gap: 8px; flex-wrap: wrap; }
+  .radio-option { flex: 1; min-width: 100px; }
+  .radio-option input[type="radio"] { display: none; }
+  .radio-option label {
+    display: flex; align-items: center; justify-content: center;
+    width: 100%; padding: 8px 6px;
+    border: 1.5px solid #C0DD97; border-radius: 8px; cursor: pointer;
+    font-size: 12.5px; font-weight: 500; color: #3B6D11;
+    background: #fff; transition: all 0.15s; user-select: none;
+    text-align: center; line-height: 1.3;
+  }
+  .radio-option input[type="radio"]:checked + label { background: #3B6D11; border-color: #3B6D11; color: #fff; }
+  .radio-option label:hover { border-color: #639922; background: #EAF3DE; }
+  .cloture {
+    background: #EAF3DE; border-left: 4px solid #639922;
+    margin: 0 40px 30px; padding: 13px 18px; border-radius: 6px;
+    font-size: 13.5px; color: #27500A; font-style: italic; line-height: 1.6;
+  }
+  .submit-section {
+    padding: 30px 40px 40px;
+    background: #fafaf8;
+    border-top: 2px solid #EAF3DE;
+  }
+  .patient-info { margin-bottom: 16px; }
+  .patient-info label { display: block; font-size: 13px; font-weight: 600; color: #444; margin-bottom: 5px; }
+  .patient-info input {
+    width: 100%; padding: 9px 12px;
+    border: 1.5px solid #C0DD97; border-radius: 6px;
+    font-size: 14px; font-family: Arial, sans-serif;
+    color: #1a1a1a; background: #fff;
+  }
+  .patient-info input:focus { outline: none; border-color: #639922; }
+  .patient-info .field-hint { font-size: 11.5px; color: #888; margin-top: 4px; font-style: italic; }
+  .btn-submit {
+    display: inline-block; padding: 13px 32px;
+    background: #3B6D11; color: #fff; border: none;
+    border-radius: 8px; font-size: 15px; font-weight: 600;
+    cursor: pointer; font-family: Arial, sans-serif; transition: background 0.15s;
+  }
+  .btn-submit:hover { background: #639922; }
+  .warning-msg {
+    background: #FFF8E1; border: 1.5px solid #F9A825;
+    border-radius: 8px; padding: 12px 16px;
+    color: #5D4037; font-size: 13.5px; margin-top: 12px;
+  }
+  /* ── RESTITUTION ── */
+  .restitution {
+    display: none;
+    padding: 32px 40px 40px;
+    background: #fff;
+    border-top: 2px solid #EAF3DE;
+  }
+  .restitution.visible { display: block; }
+  .rest-title {
+    font-size: 16px; font-weight: 700; color: #3B6D11;
+    text-transform: uppercase; letter-spacing: 0.06em;
+    margin-bottom: 4px;
+  }
+  .rest-subtitle {
+    font-size: 13px; color: #666; margin-bottom: 24px; line-height: 1.5;
+  }
+  .radar-canvas-wrap {
+    max-width: 500px; margin: 0 auto 28px;
+  }
+  .dim-bars { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+  .dim-bar-row {
+    display: grid;
+    grid-template-columns: 195px 1fr 52px;
+    align-items: center; gap: 12px;
+  }
+  .dim-bar-label { font-size: 12.5px; color: #333; font-weight: 600; }
+  .dim-bar-track { background: #EAF3DE; border-radius: 20px; height: 10px; overflow: hidden; }
+  .dim-bar-fill {
+    height: 100%; border-radius: 20px;
+    background: linear-gradient(90deg, #97C459, #3B6D11);
+    transition: width 0.7s ease;
+  }
+  .dim-bar-val { font-size: 12px; font-weight: 700; color: #3B6D11; text-align: right; }
+  .level-badge {
+    display: inline-block; padding: 1px 8px; border-radius: 20px;
+    font-size: 10.5px; font-weight: 600; margin-left: 6px; vertical-align: middle;
+  }
+  .level-eleve  { background: #3B6D11; color: #fff; }
+  .level-modere { background: #97C459; color: #fff; }
+  .level-faible { background: #e0e0d8; color: #555; }
+  .rest-legend {
+    background: #f5faf0; border-radius: 8px; padding: 16px 20px;
+    font-size: 13px; color: #444; line-height: 1.8;
+    border-left: 4px solid #97C459; margin-bottom: 28px;
+  }
+  .rest-separator {
+    border: none; border-top: 1.5px solid #d4e8c0; margin: 0 0 24px;
+  }
+  .rest-send-title {
+    font-size: 12px; font-weight: 700; color: #3B6D11;
+    text-transform: uppercase; letter-spacing: 0.04em;
+    margin-bottom: 10px;
+  }
+  .rest-send-link {
+    display: inline-block; margin: 10px 0 20px;
+    background: #3B6D11; color: #fff; text-decoration: none;
+    padding: 10px 24px; border-radius: 8px;
+    font-size: 14px; font-weight: 600;
+  }
+  .rest-send-link:hover { background: #639922; }
+  .recap-table {
+    width: 100%; border-collapse: collapse;
+    font-size: 12.5px; margin-top: 12px;
+  }
+  .recap-table th {
+    text-align: left; padding: 6px 10px;
+    background: #3B6D11; color: #fff; font-weight: 600;
+  }
+  .recap-table td { padding: 6px 10px; border-bottom: 1px solid #d4e8c0; }
+  .recap-table tr:nth-child(even) td { background: #f5faf0; }
+  @media (max-width: 600px) {
+    .header, .section, .submit-section, .restitution { padding-left: 20px; padding-right: 20px; }
+    .intro-box, .consigne, .cloture, .completion-bar-wrap, .completion-label { margin-left: 20px; margin-right: 20px; }
+    .radio-option { min-width: 80px; }
+    .radio-option label { font-size: 11.5px; padding: 7px 4px; }
+    .dim-bar-row { grid-template-columns: 120px 1fr 42px; gap: 8px; }
+    .dim-bar-label { font-size: 11px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <div class="step-badge">Questionnaire 1 / 2</div>
+    <h1 style="margin-top:10px;">Structure de fonctionnement de base</h1>
+    <div class="subtitle">Fonctionnement habituel, hors période de stress, de fatigue ou de difficulté</div>
+  </div>
+
+  <div class="intro-box">
+    <strong>À lire avant de répondre</strong>
+    Ce questionnaire explore comment votre système psychique fonctionne naturellement — indépendamment du contexte. Il décrit vos lois internes de fonctionnement, pas ce que vous préférez ponctuellement. Certaines affirmations peuvent ne pas correspondre à votre situation actuelle. Les réponses prennent sens dans une lecture globale et croisée.
+  </div>
+
+  <div class="consigne">
+    <strong>Consigne</strong>
+    Les affirmations suivantes portent sur votre manière habituelle et naturelle de fonctionner, lorsque vous allez globalement bien. Il n'y a ni bonne ni mauvaise réponse. Répondez en vous appuyant sur votre fonctionnement le plus spontané et le plus fréquent.
+  </div>
+
+  <div class="completion-bar-wrap">
+    <div class="completion-bar" id="progressBar"></div>
+  </div>
+  <div class="completion-label" id="progressLabel">0 / 66 question(s) répondue(s)</div>
+
+  <div class="section" id="questionsContainer">
+
+    <div class="question-block" id="qblock-0">
+      <div class="question-text">
+        <span class="question-num">1.</span> Mon engagement dépend principalement de l'intérêt et du sens que je perçois dans ce que je fais.
+      </div>
+      <div class="radio-group">
+        <div class="radio-option">
+          <input type="radio" name="q0" id="q0_0" value="0" onchange="onAnswer(0,0)">
+          <label for="q0_0">Pas du tout vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q0" id="q0_1" value="1" onchange="onAnswer(0,1)">
+          <label for="q0_1">Plutôt faux</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q0" id="q0_2" value="2" onchange="onAnswer(0,2)">
+          <label for="q0_2">Plutôt vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q0" id="q0_3" value="3" onchange="onAnswer(0,3)">
+          <label for="q0_3">Tout à fait vrai</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="question-block" id="qblock-1">
+      <div class="question-text">
+        <span class="question-num">2.</span> Je capte facilement les ambiances ou tensions implicites d'un contexte.
+      </div>
+      <div class="radio-group">
+        <div class="radio-option">
+          <input type="radio" name="q1" id="q1_0" value="0" onchange="onAnswer(1,0)">
+          <label for="q1_0">Pas du tout vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q1" id="q1_1" value="1" onchange="onAnswer(1,1)">
+          <label for="q1_1">Plutôt faux</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q1" id="q1_2" value="2" onchange="onAnswer(1,2)">
+          <label for="q1_2">Plutôt vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q1" id="q1_3" value="3" onchange="onAnswer(1,3)">
+          <label for="q1_3">Tout à fait vrai</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="question-block" id="qblock-2">
+      <div class="question-text">
+        <span class="question-num">3.</span> Je peux agir efficacement sans avoir besoin de comprendre le sens global de ce que je fais.
+      </div>
+      <div class="radio-group">
+        <div class="radio-option">
+          <input type="radio" name="q2" id="q2_0" value="0" onchange="onAnswer(2,0)">
+          <label for="q2_0">Pas du tout vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q2" id="q2_1" value="1" onchange="onAnswer(2,1)">
+          <label for="q2_1">Plutôt faux</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q2" id="q2_2" value="2" onchange="onAnswer(2,2)">
+          <label for="q2_2">Plutôt vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q2" id="q2_3" value="3" onchange="onAnswer(2,3)">
+          <label for="q2_3">Tout à fait vrai</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="question-block" id="qblock-3">
+      <div class="question-text">
+        <span class="question-num">4.</span> Lorsque je réfléchis, plusieurs pistes de compréhension peuvent être actives en même temps.
+      </div>
+      <div class="radio-group">
+        <div class="radio-option">
+          <input type="radio" name="q3" id="q3_0" value="0" onchange="onAnswer(3,0)">
+          <label for="q3_0">Pas du tout vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q3" id="q3_1" value="1" onchange="onAnswer(3,1)">
+          <label for="q3_1">Plutôt faux</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q3" id="q3_2" value="2" onchange="onAnswer(3,2)">
+          <label for="q3_2">Plutôt vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q3" id="q3_3" value="3" onchange="onAnswer(3,3)">
+          <label for="q3_3">Tout à fait vrai</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="question-block" id="qblock-4">
+      <div class="question-text">
+        <span class="question-num">5.</span> Les environnements très interactifs me demandent un effort d'adaptation.
+      </div>
+      <div class="radio-group">
+        <div class="radio-option">
+          <input type="radio" name="q4" id="q4_0" value="0" onchange="onAnswer(4,0)">
+          <label for="q4_0">Pas du tout vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q4" id="q4_1" value="1" onchange="onAnswer(4,1)">
+          <label for="q4_1">Plutôt faux</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q4" id="q4_2" value="2" onchange="onAnswer(4,2)">
+          <label for="q4_2">Plutôt vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q4" id="q4_3" value="3" onchange="onAnswer(4,3)">
+          <label for="q4_3">Tout à fait vrai</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="question-block" id="qblock-5">
+      <div class="question-text">
+        <span class="question-num">6.</span> J'ai besoin que les relations soient cohérentes pour me sentir à l'aise.
+      </div>
+      <div class="radio-group">
+        <div class="radio-option">
+          <input type="radio" name="q5" id="q5_0" value="0" onchange="onAnswer(5,0)">
+          <label for="q5_0">Pas du tout vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q5" id="q5_1" value="1" onchange="onAnswer(5,1)">
+          <label for="q5_1">Plutôt faux</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q5" id="q5_2" value="2" onchange="onAnswer(5,2)">
+          <label for="q5_2">Plutôt vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q5" id="q5_3" value="3" onchange="onAnswer(5,3)">
+          <label for="q5_3">Tout à fait vrai</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="question-block" id="qblock-6">
+      <div class="question-text">
+        <span class="question-num">7.</span> Ma compréhension d'un sujet arrive souvent avant que je puisse en formuler clairement les étapes.
+      </div>
+      <div class="radio-group">
+        <div class="radio-option">
+          <input type="radio" name="q6" id="q6_0" value="0" onchange="onAnswer(6,0)">
+          <label for="q6_0">Pas du tout vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q6" id="q6_1" value="1" onchange="onAnswer(6,1)">
+          <label for="q6_1">Plutôt faux</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q6" id="q6_2" value="2" onchange="onAnswer(6,2)">
+          <label for="q6_2">Plutôt vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q6" id="q6_3" value="3" onchange="onAnswer(6,3)">
+          <label for="q6_3">Tout à fait vrai</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="question-block" id="qblock-7">
+      <div class="question-text">
+        <span class="question-num">8.</span> Les procédures claires et détaillées me rassurent et soutiennent mon efficacité.
+      </div>
+      <div class="radio-group">
+        <div class="radio-option">
+          <input type="radio" name="q7" id="q7_0" value="0" onchange="onAnswer(7,0)">
+          <label for="q7_0">Pas du tout vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q7" id="q7_1" value="1" onchange="onAnswer(7,1)">
+          <label for="q7_1">Plutôt faux</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q7" id="q7_2" value="2" onchange="onAnswer(7,2)">
+          <label for="q7_2">Plutôt vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q7" id="q7_3" value="3" onchange="onAnswer(7,3)">
+          <label for="q7_3">Tout à fait vrai</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="question-block" id="qblock-8">
+      <div class="question-text">
+        <span class="question-num">9.</span> Je fonctionne par phases d'élan et de retrait, de manière naturelle.
+      </div>
+      <div class="radio-group">
+        <div class="radio-option">
+          <input type="radio" name="q8" id="q8_0" value="0" onchange="onAnswer(8,0)">
+          <label for="q8_0">Pas du tout vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q8" id="q8_1" value="1" onchange="onAnswer(8,1)">
+          <label for="q8_1">Plutôt faux</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q8" id="q8_2" value="2" onchange="onAnswer(8,2)">
+          <label for="q8_2">Plutôt vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q8" id="q8_3" value="3" onchange="onAnswer(8,3)">
+          <label for="q8_3">Tout à fait vrai</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="question-block" id="qblock-9">
+      <div class="question-text">
+        <span class="question-num">10.</span> Les informations émotionnelles sont intégrées en profondeur dans ma manière de comprendre les situations.
+      </div>
+      <div class="radio-group">
+        <div class="radio-option">
+          <input type="radio" name="q9" id="q9_0" value="0" onchange="onAnswer(9,0)">
+          <label for="q9_0">Pas du tout vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q9" id="q9_1" value="1" onchange="onAnswer(9,1)">
+          <label for="q9_1">Plutôt faux</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q9" id="q9_2" value="2" onchange="onAnswer(9,2)">
+          <label for="q9_2">Plutôt vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q9" id="q9_3" value="3" onchange="onAnswer(9,3)">
+          <label for="q9_3">Tout à fait vrai</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="question-block" id="qblock-10">
+      <div class="question-text">
+        <span class="question-num">11.</span> Je préfère des échanges ciblés et investis à des interactions nombreuses.
+      </div>
+      <div class="radio-group">
+        <div class="radio-option">
+          <input type="radio" name="q10" id="q10_0" value="0" onchange="onAnswer(10,0)">
+          <label for="q10_0">Pas du tout vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q10" id="q10_1" value="1" onchange="onAnswer(10,1)">
+          <label for="q10_1">Plutôt faux</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q10" id="q10_2" value="2" onchange="onAnswer(10,2)">
+          <label for="q10_2">Plutôt vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q10" id="q10_3" value="3" onchange="onAnswer(10,3)">
+          <label for="q10_3">Tout à fait vrai</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="question-block" id="qblock-11">
+      <div class="question-text">
+        <span class="question-num">12.</span> Je peux laisser une réflexion ouverte tant que le sens n'est pas stabilisé.
+      </div>
+      <div class="radio-group">
+        <div class="radio-option">
+          <input type="radio" name="q11" id="q11_0" value="0" onchange="onAnswer(11,0)">
+          <label for="q11_0">Pas du tout vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q11" id="q11_1" value="1" onchange="onAnswer(11,1)">
+          <label for="q11_1">Plutôt faux</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q11" id="q11_2" value="2" onchange="onAnswer(11,2)">
+          <label for="q11_2">Plutôt vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q11" id="q11_3" value="3" onchange="onAnswer(11,3)">
+          <label for="q11_3">Tout à fait vrai</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="question-block" id="qblock-12">
+      <div class="question-text">
+        <span class="question-num">13.</span> La fiabilité relationnelle est une condition importante de mon équilibre.
+      </div>
+      <div class="radio-group">
+        <div class="radio-option">
+          <input type="radio" name="q12" id="q12_0" value="0" onchange="onAnswer(12,0)">
+          <label for="q12_0">Pas du tout vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q12" id="q12_1" value="1" onchange="onAnswer(12,1)">
+          <label for="q12_1">Plutôt faux</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q12" id="q12_2" value="2" onchange="onAnswer(12,2)">
+          <label for="q12_2">Plutôt vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q12" id="q12_3" value="3" onchange="onAnswer(12,3)">
+          <label for="q12_3">Tout à fait vrai</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="question-block" id="qblock-13">
+      <div class="question-text">
+        <span class="question-num">14.</span> Je me repère plus facilement dans des idées complexes que dans des procédures très détaillées.
+      </div>
+      <div class="radio-group">
+        <div class="radio-option">
+          <input type="radio" name="q13" id="q13_0" value="0" onchange="onAnswer(13,0)">
+          <label for="q13_0">Pas du tout vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q13" id="q13_1" value="1" onchange="onAnswer(13,1)">
+          <label for="q13_1">Plutôt faux</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q13" id="q13_2" value="2" onchange="onAnswer(13,2)">
+          <label for="q13_2">Plutôt vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q13" id="q13_3" value="3" onchange="onAnswer(13,3)">
+          <label for="q13_3">Tout à fait vrai</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="question-block" id="qblock-14">
+      <div class="question-text">
+        <span class="question-num">15.</span> Les cadres trop rigides peuvent freiner mon fonctionnement.
+      </div>
+      <div class="radio-group">
+        <div class="radio-option">
+          <input type="radio" name="q14" id="q14_0" value="0" onchange="onAnswer(14,0)">
+          <label for="q14_0">Pas du tout vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q14" id="q14_1" value="1" onchange="onAnswer(14,1)">
+          <label for="q14_1">Plutôt faux</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q14" id="q14_2" value="2" onchange="onAnswer(14,2)">
+          <label for="q14_2">Plutôt vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q14" id="q14_3" value="3" onchange="onAnswer(14,3)">
+          <label for="q14_3">Tout à fait vrai</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="question-block" id="qblock-15">
+      <div class="question-text">
+        <span class="question-num">16.</span> Je suis sensible aux incohérences entre les paroles, les attitudes et les actes.
+      </div>
+      <div class="radio-group">
+        <div class="radio-option">
+          <input type="radio" name="q15" id="q15_0" value="0" onchange="onAnswer(15,0)">
+          <label for="q15_0">Pas du tout vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q15" id="q15_1" value="1" onchange="onAnswer(15,1)">
+          <label for="q15_1">Plutôt faux</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q15" id="q15_2" value="2" onchange="onAnswer(15,2)">
+          <label for="q15_2">Plutôt vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q15" id="q15_3" value="3" onchange="onAnswer(15,3)">
+          <label for="q15_3">Tout à fait vrai</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="question-block" id="qblock-16">
+      <div class="question-text">
+        <span class="question-num">17.</span> Je peux prendre une décision rapidement lorsqu'elle est fonctionnelle, même si elle ne correspond pas totalement à mes valeurs.
+      </div>
+      <div class="radio-group">
+        <div class="radio-option">
+          <input type="radio" name="q16" id="q16_0" value="0" onchange="onAnswer(16,0)">
+          <label for="q16_0">Pas du tout vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q16" id="q16_1" value="1" onchange="onAnswer(16,1)">
+          <label for="q16_1">Plutôt faux</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q16" id="q16_2" value="2" onchange="onAnswer(16,2)">
+          <label for="q16_2">Plutôt vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q16" id="q16_3" value="3" onchange="onAnswer(16,3)">
+          <label for="q16_3">Tout à fait vrai</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="question-block" id="qblock-17">
+      <div class="question-text">
+        <span class="question-num">18.</span> J'ai besoin de temps seul·e pour me recentrer et récupérer.
+      </div>
+      <div class="radio-group">
+        <div class="radio-option">
+          <input type="radio" name="q17" id="q17_0" value="0" onchange="onAnswer(17,0)">
+          <label for="q17_0">Pas du tout vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q17" id="q17_1" value="1" onchange="onAnswer(17,1)">
+          <label for="q17_1">Plutôt faux</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q17" id="q17_2" value="2" onchange="onAnswer(17,2)">
+          <label for="q17_2">Plutôt vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q17" id="q17_3" value="3" onchange="onAnswer(17,3)">
+          <label for="q17_3">Tout à fait vrai</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="question-block" id="qblock-18">
+      <div class="question-text">
+        <span class="question-num">19.</span> Je tends spontanément à chercher le sens global d'une situation plutôt qu'à avancer étape par étape.
+      </div>
+      <div class="radio-group">
+        <div class="radio-option">
+          <input type="radio" name="q18" id="q18_0" value="0" onchange="onAnswer(18,0)">
+          <label for="q18_0">Pas du tout vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q18" id="q18_1" value="1" onchange="onAnswer(18,1)">
+          <label for="q18_1">Plutôt faux</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q18" id="q18_2" value="2" onchange="onAnswer(18,2)">
+          <label for="q18_2">Plutôt vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q18" id="q18_3" value="3" onchange="onAnswer(18,3)">
+          <label for="q18_3">Tout à fait vrai</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="question-block" id="qblock-19">
+      <div class="question-text">
+        <span class="question-num">20.</span> Les tensions non exprimées me sont difficiles à ignorer.
+      </div>
+      <div class="radio-group">
+        <div class="radio-option">
+          <input type="radio" name="q19" id="q19_0" value="0" onchange="onAnswer(19,0)">
+          <label for="q19_0">Pas du tout vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q19" id="q19_1" value="1" onchange="onAnswer(19,1)">
+          <label for="q19_1">Plutôt faux</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q19" id="q19_2" value="2" onchange="onAnswer(19,2)">
+          <label for="q19_2">Plutôt vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q19" id="q19_3" value="3" onchange="onAnswer(19,3)">
+          <label for="q19_3">Tout à fait vrai</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="question-block" id="qblock-20">
+      <div class="question-text">
+        <span class="question-num">21.</span> Je fonctionne mieux lorsque les cadres sont compréhensibles, même s'ils sont souples.
+      </div>
+      <div class="radio-group">
+        <div class="radio-option">
+          <input type="radio" name="q20" id="q20_0" value="0" onchange="onAnswer(20,0)">
+          <label for="q20_0">Pas du tout vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q20" id="q20_1" value="1" onchange="onAnswer(20,1)">
+          <label for="q20_1">Plutôt faux</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q20" id="q20_2" value="2" onchange="onAnswer(20,2)">
+          <label for="q20_2">Plutôt vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q20" id="q20_3" value="3" onchange="onAnswer(20,3)">
+          <label for="q20_3">Tout à fait vrai</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="question-block" id="qblock-21">
+      <div class="question-text">
+        <span class="question-num">22.</span> Je me régule plus facilement dans le calme que dans la stimulation sociale.
+      </div>
+      <div class="radio-group">
+        <div class="radio-option">
+          <input type="radio" name="q21" id="q21_0" value="0" onchange="onAnswer(21,0)">
+          <label for="q21_0">Pas du tout vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q21" id="q21_1" value="1" onchange="onAnswer(21,1)">
+          <label for="q21_1">Plutôt faux</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q21" id="q21_2" value="2" onchange="onAnswer(21,2)">
+          <label for="q21_2">Plutôt vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q21" id="q21_3" value="3" onchange="onAnswer(21,3)">
+          <label for="q21_3">Tout à fait vrai</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="question-block" id="qblock-22">
+      <div class="question-text">
+        <span class="question-num">23.</span> La contrainte sans compréhension a un impact direct sur ma mobilisation interne.
+      </div>
+      <div class="radio-group">
+        <div class="radio-option">
+          <input type="radio" name="q22" id="q22_0" value="0" onchange="onAnswer(22,0)">
+          <label for="q22_0">Pas du tout vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q22" id="q22_1" value="1" onchange="onAnswer(22,1)">
+          <label for="q22_1">Plutôt faux</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q22" id="q22_2" value="2" onchange="onAnswer(22,2)">
+          <label for="q22_2">Plutôt vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q22" id="q22_3" value="3" onchange="onAnswer(22,3)">
+          <label for="q22_3">Tout à fait vrai</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="question-block" id="qblock-23">
+      <div class="question-text">
+        <span class="question-num">24.</span> Je préfère parfois une solution imparfaite mais rapide à une solution plus juste mais longue à construire.
+      </div>
+      <div class="radio-group">
+        <div class="radio-option">
+          <input type="radio" name="q23" id="q23_0" value="0" onchange="onAnswer(23,0)">
+          <label for="q23_0">Pas du tout vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q23" id="q23_1" value="1" onchange="onAnswer(23,1)">
+          <label for="q23_1">Plutôt faux</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q23" id="q23_2" value="2" onchange="onAnswer(23,2)">
+          <label for="q23_2">Plutôt vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q23" id="q23_3" value="3" onchange="onAnswer(23,3)">
+          <label for="q23_3">Tout à fait vrai</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="question-block" id="qblock-24">
+      <div class="question-text">
+        <span class="question-num">25.</span> Mon système perçoit finement les variations de l'environnement, même lorsqu'elles sont discrètes.
+      </div>
+      <div class="radio-group">
+        <div class="radio-option">
+          <input type="radio" name="q24" id="q24_0" value="0" onchange="onAnswer(24,0)">
+          <label for="q24_0">Pas du tout vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q24" id="q24_1" value="1" onchange="onAnswer(24,1)">
+          <label for="q24_1">Plutôt faux</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q24" id="q24_2" value="2" onchange="onAnswer(24,2)">
+          <label for="q24_2">Plutôt vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q24" id="q24_3" value="3" onchange="onAnswer(24,3)">
+          <label for="q24_3">Tout à fait vrai</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="question-block" id="qblock-25">
+      <div class="question-text">
+        <span class="question-num">26.</span> Je me repère dans une relation lorsque les règles, même implicites, sont lisibles.
+      </div>
+      <div class="radio-group">
+        <div class="radio-option">
+          <input type="radio" name="q25" id="q25_0" value="0" onchange="onAnswer(25,0)">
+          <label for="q25_0">Pas du tout vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q25" id="q25_1" value="1" onchange="onAnswer(25,1)">
+          <label for="q25_1">Plutôt faux</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q25" id="q25_2" value="2" onchange="onAnswer(25,2)">
+          <label for="q25_2">Plutôt vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q25" id="q25_3" value="3" onchange="onAnswer(25,3)">
+          <label for="q25_3">Tout à fait vrai</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="question-block" id="qblock-26">
+      <div class="question-text">
+        <span class="question-num">27.</span> Mes décisions s'appuient avant tout sur ce qui fait sens pour moi.
+      </div>
+      <div class="radio-group">
+        <div class="radio-option">
+          <input type="radio" name="q26" id="q26_0" value="0" onchange="onAnswer(26,0)">
+          <label for="q26_0">Pas du tout vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q26" id="q26_1" value="1" onchange="onAnswer(26,1)">
+          <label for="q26_1">Plutôt faux</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q26" id="q26_2" value="2" onchange="onAnswer(26,2)">
+          <label for="q26_2">Plutôt vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q26" id="q26_3" value="3" onchange="onAnswer(26,3)">
+          <label for="q26_3">Tout à fait vrai</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="question-block" id="qblock-27">
+      <div class="question-text">
+        <span class="question-num">28.</span> Je peux laisser une tâche ouverte tant que le sens n'est pas stabilisé.
+      </div>
+      <div class="radio-group">
+        <div class="radio-option">
+          <input type="radio" name="q27" id="q27_0" value="0" onchange="onAnswer(27,0)">
+          <label for="q27_0">Pas du tout vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q27" id="q27_1" value="1" onchange="onAnswer(27,1)">
+          <label for="q27_1">Plutôt faux</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q27" id="q27_2" value="2" onchange="onAnswer(27,2)">
+          <label for="q27_2">Plutôt vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q27" id="q27_3" value="3" onchange="onAnswer(27,3)">
+          <label for="q27_3">Tout à fait vrai</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="question-block" id="qblock-28">
+      <div class="question-text">
+        <span class="question-num">29.</span> Une présence sociale continue peut devenir coûteuse, même lorsqu'elle est agréable.
+      </div>
+      <div class="radio-group">
+        <div class="radio-option">
+          <input type="radio" name="q28" id="q28_0" value="0" onchange="onAnswer(28,0)">
+          <label for="q28_0">Pas du tout vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q28" id="q28_1" value="1" onchange="onAnswer(28,1)">
+          <label for="q28_1">Plutôt faux</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q28" id="q28_2" value="2" onchange="onAnswer(28,2)">
+          <label for="q28_2">Plutôt vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q28" id="q28_3" value="3" onchange="onAnswer(28,3)">
+          <label for="q28_3">Tout à fait vrai</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="question-block" id="qblock-29">
+      <div class="question-text">
+        <span class="question-num">30.</span> Je suis plus efficace lorsque je peux respecter mes propres rythmes d'engagement.
+      </div>
+      <div class="radio-group">
+        <div class="radio-option">
+          <input type="radio" name="q29" id="q29_0" value="0" onchange="onAnswer(29,0)">
+          <label for="q29_0">Pas du tout vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q29" id="q29_1" value="1" onchange="onAnswer(29,1)">
+          <label for="q29_1">Plutôt faux</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q29" id="q29_2" value="2" onchange="onAnswer(29,2)">
+          <label for="q29_2">Plutôt vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q29" id="q29_3" value="3" onchange="onAnswer(29,3)">
+          <label for="q29_3">Tout à fait vrai</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="question-block" id="qblock-30">
+      <div class="question-text">
+        <span class="question-num">31.</span> Je préfère des structures souples à des règles strictement définies.
+      </div>
+      <div class="radio-group">
+        <div class="radio-option">
+          <input type="radio" name="q30" id="q30_0" value="0" onchange="onAnswer(30,0)">
+          <label for="q30_0">Pas du tout vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q30" id="q30_1" value="1" onchange="onAnswer(30,1)">
+          <label for="q30_1">Plutôt faux</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q30" id="q30_2" value="2" onchange="onAnswer(30,2)">
+          <label for="q30_2">Plutôt vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q30" id="q30_3" value="3" onchange="onAnswer(30,3)">
+          <label for="q30_3">Tout à fait vrai</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="question-block" id="qblock-31">
+      <div class="question-text">
+        <span class="question-num">32.</span> Les relations floues ou ambiguës mobilisent fortement mon attention.
+      </div>
+      <div class="radio-group">
+        <div class="radio-option">
+          <input type="radio" name="q31" id="q31_0" value="0" onchange="onAnswer(31,0)">
+          <label for="q31_0">Pas du tout vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q31" id="q31_1" value="1" onchange="onAnswer(31,1)">
+          <label for="q31_1">Plutôt faux</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q31" id="q31_2" value="2" onchange="onAnswer(31,2)">
+          <label for="q31_2">Plutôt vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q31" id="q31_3" value="3" onchange="onAnswer(31,3)">
+          <label for="q31_3">Tout à fait vrai</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="question-block" id="qblock-32">
+      <div class="question-text">
+        <span class="question-num">33.</span> Je me mobilise davantage lorsque je perçois un impact concret.
+      </div>
+      <div class="radio-group">
+        <div class="radio-option">
+          <input type="radio" name="q32" id="q32_0" value="0" onchange="onAnswer(32,0)">
+          <label for="q32_0">Pas du tout vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q32" id="q32_1" value="1" onchange="onAnswer(32,1)">
+          <label for="q32_1">Plutôt faux</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q32" id="q32_2" value="2" onchange="onAnswer(32,2)">
+          <label for="q32_2">Plutôt vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q32" id="q32_3" value="3" onchange="onAnswer(32,3)">
+          <label for="q32_3">Tout à fait vrai</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="question-block" id="qblock-33">
+      <div class="question-text">
+        <span class="question-num">34.</span> Je fonctionne naturellement par mise en lien plutôt que par accumulation d'informations isolées.
+      </div>
+      <div class="radio-group">
+        <div class="radio-option">
+          <input type="radio" name="q33" id="q33_0" value="0" onchange="onAnswer(33,0)">
+          <label for="q33_0">Pas du tout vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q33" id="q33_1" value="1" onchange="onAnswer(33,1)">
+          <label for="q33_1">Plutôt faux</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q33" id="q33_2" value="2" onchange="onAnswer(33,2)">
+          <label for="q33_2">Plutôt vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q33" id="q33_3" value="3" onchange="onAnswer(33,3)">
+          <label for="q33_3">Tout à fait vrai</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="question-block" id="qblock-34">
+      <div class="question-text">
+        <span class="question-num">35.</span> J'ai besoin de comprendre la logique d'une situation pour me sentir apaisé·e.
+      </div>
+      <div class="radio-group">
+        <div class="radio-option">
+          <input type="radio" name="q34" id="q34_0" value="0" onchange="onAnswer(34,0)">
+          <label for="q34_0">Pas du tout vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q34" id="q34_1" value="1" onchange="onAnswer(34,1)">
+          <label for="q34_1">Plutôt faux</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q34" id="q34_2" value="2" onchange="onAnswer(34,2)">
+          <label for="q34_2">Plutôt vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q34" id="q34_3" value="3" onchange="onAnswer(34,3)">
+          <label for="q34_3">Tout à fait vrai</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="question-block" id="qblock-35">
+      <div class="question-text">
+        <span class="question-num">36.</span> Je me sens plus disponible relationnellement lorsque mes temps de retrait sont respectés.
+      </div>
+      <div class="radio-group">
+        <div class="radio-option">
+          <input type="radio" name="q35" id="q35_0" value="0" onchange="onAnswer(35,0)">
+          <label for="q35_0">Pas du tout vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q35" id="q35_1" value="1" onchange="onAnswer(35,1)">
+          <label for="q35_1">Plutôt faux</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q35" id="q35_2" value="2" onchange="onAnswer(35,2)">
+          <label for="q35_2">Plutôt vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q35" id="q35_3" value="3" onchange="onAnswer(35,3)">
+          <label for="q35_3">Tout à fait vrai</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="question-block" id="qblock-36">
+      <div class="question-text">
+        <span class="question-num">37.</span> Je peux m'adapter durablement à un fonctionnement très normé sans que cela me coûte intérieurement.
+      </div>
+      <div class="radio-group">
+        <div class="radio-option">
+          <input type="radio" name="q36" id="q36_0" value="0" onchange="onAnswer(36,0)">
+          <label for="q36_0">Pas du tout vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q36" id="q36_1" value="1" onchange="onAnswer(36,1)">
+          <label for="q36_1">Plutôt faux</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q36" id="q36_2" value="2" onchange="onAnswer(36,2)">
+          <label for="q36_2">Plutôt vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q36" id="q36_3" value="3" onchange="onAnswer(36,3)">
+          <label for="q36_3">Tout à fait vrai</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="question-block" id="qblock-37">
+      <div class="question-text">
+        <span class="question-num">38.</span> Mon énergie se mobilise naturellement lorsque je me sens aligné·e avec une activité.
+      </div>
+      <div class="radio-group">
+        <div class="radio-option">
+          <input type="radio" name="q37" id="q37_0" value="0" onchange="onAnswer(37,0)">
+          <label for="q37_0">Pas du tout vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q37" id="q37_1" value="1" onchange="onAnswer(37,1)">
+          <label for="q37_1">Plutôt faux</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q37" id="q37_2" value="2" onchange="onAnswer(37,2)">
+          <label for="q37_2">Plutôt vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q37" id="q37_3" value="3" onchange="onAnswer(37,3)">
+          <label for="q37_3">Tout à fait vrai</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="question-block" id="qblock-38">
+      <div class="question-text">
+        <span class="question-num">39.</span> Je suis sensible aux dynamiques de pouvoir ou de manipulation, même subtiles.
+      </div>
+      <div class="radio-group">
+        <div class="radio-option">
+          <input type="radio" name="q38" id="q38_0" value="0" onchange="onAnswer(38,0)">
+          <label for="q38_0">Pas du tout vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q38" id="q38_1" value="1" onchange="onAnswer(38,1)">
+          <label for="q38_1">Plutôt faux</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q38" id="q38_2" value="2" onchange="onAnswer(38,2)">
+          <label for="q38_2">Plutôt vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q38" id="q38_3" value="3" onchange="onAnswer(38,3)">
+          <label for="q38_3">Tout à fait vrai</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="question-block" id="qblock-39">
+      <div class="question-text">
+        <span class="question-num">40.</span> Je préfère des échanges où la profondeur prime sur la fréquence.
+      </div>
+      <div class="radio-group">
+        <div class="radio-option">
+          <input type="radio" name="q39" id="q39_0" value="0" onchange="onAnswer(39,0)">
+          <label for="q39_0">Pas du tout vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q39" id="q39_1" value="1" onchange="onAnswer(39,1)">
+          <label for="q39_1">Plutôt faux</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q39" id="q39_2" value="2" onchange="onAnswer(39,2)">
+          <label for="q39_2">Plutôt vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q39" id="q39_3" value="3" onchange="onAnswer(39,3)">
+          <label for="q39_3">Tout à fait vrai</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="question-block" id="qblock-40">
+      <div class="question-text">
+        <span class="question-num">41.</span> Je prends en compte l'impact humain d'une décision autant que sa logique.
+      </div>
+      <div class="radio-group">
+        <div class="radio-option">
+          <input type="radio" name="q40" id="q40_0" value="0" onchange="onAnswer(40,0)">
+          <label for="q40_0">Pas du tout vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q40" id="q40_1" value="1" onchange="onAnswer(40,1)">
+          <label for="q40_1">Plutôt faux</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q40" id="q40_2" value="2" onchange="onAnswer(40,2)">
+          <label for="q40_2">Plutôt vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q40" id="q40_3" value="3" onchange="onAnswer(40,3)">
+          <label for="q40_3">Tout à fait vrai</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="question-block" id="qblock-41">
+      <div class="question-text">
+        <span class="question-num">42.</span> Je peux laisser une réflexion ouverte sans inconfort tant que la cohérence est préservée.
+      </div>
+      <div class="radio-group">
+        <div class="radio-option">
+          <input type="radio" name="q41" id="q41_0" value="0" onchange="onAnswer(41,0)">
+          <label for="q41_0">Pas du tout vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q41" id="q41_1" value="1" onchange="onAnswer(41,1)">
+          <label for="q41_1">Plutôt faux</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q41" id="q41_2" value="2" onchange="onAnswer(41,2)">
+          <label for="q41_2">Plutôt vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q41" id="q41_3" value="3" onchange="onAnswer(41,3)">
+          <label for="q41_3">Tout à fait vrai</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="question-block" id="qblock-42">
+      <div class="question-text">
+        <span class="question-num">43.</span> J'ai besoin de limites claires pour me sentir à l'aise dans une relation.
+      </div>
+      <div class="radio-group">
+        <div class="radio-option">
+          <input type="radio" name="q42" id="q42_0" value="0" onchange="onAnswer(42,0)">
+          <label for="q42_0">Pas du tout vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q42" id="q42_1" value="1" onchange="onAnswer(42,1)">
+          <label for="q42_1">Plutôt faux</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q42" id="q42_2" value="2" onchange="onAnswer(42,2)">
+          <label for="q42_2">Plutôt vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q42" id="q42_3" value="3" onchange="onAnswer(42,3)">
+          <label for="q42_3">Tout à fait vrai</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="question-block" id="qblock-43">
+      <div class="question-text">
+        <span class="question-num">44.</span> Il m'est possible d'agir efficacement même lorsque l'activité n'a pas de sens pour moi.
+      </div>
+      <div class="radio-group">
+        <div class="radio-option">
+          <input type="radio" name="q43" id="q43_0" value="0" onchange="onAnswer(43,0)">
+          <label for="q43_0">Pas du tout vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q43" id="q43_1" value="1" onchange="onAnswer(43,1)">
+          <label for="q43_1">Plutôt faux</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q43" id="q43_2" value="2" onchange="onAnswer(43,2)">
+          <label for="q43_2">Plutôt vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q43" id="q43_3" value="3" onchange="onAnswer(43,3)">
+          <label for="q43_3">Tout à fait vrai</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="question-block" id="qblock-44">
+      <div class="question-text">
+        <span class="question-num">45.</span> La clarté interne est une condition essentielle de mon équilibre.
+      </div>
+      <div class="radio-group">
+        <div class="radio-option">
+          <input type="radio" name="q44" id="q44_0" value="0" onchange="onAnswer(44,0)">
+          <label for="q44_0">Pas du tout vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q44" id="q44_1" value="1" onchange="onAnswer(44,1)">
+          <label for="q44_1">Plutôt faux</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q44" id="q44_2" value="2" onchange="onAnswer(44,2)">
+          <label for="q44_2">Plutôt vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q44" id="q44_3" value="3" onchange="onAnswer(44,3)">
+          <label for="q44_3">Tout à fait vrai</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="question-block" id="qblock-45">
+      <div class="question-text">
+        <span class="question-num">46.</span> Je suis plus efficace lorsque le cadre soutient ma logique interne.
+      </div>
+      <div class="radio-group">
+        <div class="radio-option">
+          <input type="radio" name="q45" id="q45_0" value="0" onchange="onAnswer(45,0)">
+          <label for="q45_0">Pas du tout vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q45" id="q45_1" value="1" onchange="onAnswer(45,1)">
+          <label for="q45_1">Plutôt faux</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q45" id="q45_2" value="2" onchange="onAnswer(45,2)">
+          <label for="q45_2">Plutôt vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q45" id="q45_3" value="3" onchange="onAnswer(45,3)">
+          <label for="q45_3">Tout à fait vrai</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="question-block" id="qblock-46">
+      <div class="question-text">
+        <span class="question-num">47.</span> Les émotions fortes mobilisent mon énergie interne.
+      </div>
+      <div class="radio-group">
+        <div class="radio-option">
+          <input type="radio" name="q46" id="q46_0" value="0" onchange="onAnswer(46,0)">
+          <label for="q46_0">Pas du tout vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q46" id="q46_1" value="1" onchange="onAnswer(46,1)">
+          <label for="q46_1">Plutôt faux</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q46" id="q46_2" value="2" onchange="onAnswer(46,2)">
+          <label for="q46_2">Plutôt vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q46" id="q46_3" value="3" onchange="onAnswer(46,3)">
+          <label for="q46_3">Tout à fait vrai</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="question-block" id="qblock-47">
+      <div class="question-text">
+        <span class="question-num">48.</span> J'ai besoin de sentir que ce que je fais a une utilité réelle.
+      </div>
+      <div class="radio-group">
+        <div class="radio-option">
+          <input type="radio" name="q47" id="q47_0" value="0" onchange="onAnswer(47,0)">
+          <label for="q47_0">Pas du tout vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q47" id="q47_1" value="1" onchange="onAnswer(47,1)">
+          <label for="q47_1">Plutôt faux</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q47" id="q47_2" value="2" onchange="onAnswer(47,2)">
+          <label for="q47_2">Plutôt vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q47" id="q47_3" value="3" onchange="onAnswer(47,3)">
+          <label for="q47_3">Tout à fait vrai</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="question-block" id="qblock-48">
+      <div class="question-text">
+        <span class="question-num">49.</span> Je peux comprendre une situation complexe sans pouvoir immédiatement l'expliquer.
+      </div>
+      <div class="radio-group">
+        <div class="radio-option">
+          <input type="radio" name="q48" id="q48_0" value="0" onchange="onAnswer(48,0)">
+          <label for="q48_0">Pas du tout vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q48" id="q48_1" value="1" onchange="onAnswer(48,1)">
+          <label for="q48_1">Plutôt faux</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q48" id="q48_2" value="2" onchange="onAnswer(48,2)">
+          <label for="q48_2">Plutôt vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q48" id="q48_3" value="3" onchange="onAnswer(48,3)">
+          <label for="q48_3">Tout à fait vrai</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="question-block" id="qblock-49">
+      <div class="question-text">
+        <span class="question-num">50.</span> Les échanges prolongés avec plusieurs personnes sollicitent fortement mon énergie.
+      </div>
+      <div class="radio-group">
+        <div class="radio-option">
+          <input type="radio" name="q49" id="q49_0" value="0" onchange="onAnswer(49,0)">
+          <label for="q49_0">Pas du tout vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q49" id="q49_1" value="1" onchange="onAnswer(49,1)">
+          <label for="q49_1">Plutôt faux</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q49" id="q49_2" value="2" onchange="onAnswer(49,2)">
+          <label for="q49_2">Plutôt vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q49" id="q49_3" value="3" onchange="onAnswer(49,3)">
+          <label for="q49_3">Tout à fait vrai</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="question-block" id="qblock-50">
+      <div class="question-text">
+        <span class="question-num">51.</span> Je peux agir sans inconfort dans des cadres stricts tant qu'ils sont efficaces.
+      </div>
+      <div class="radio-group">
+        <div class="radio-option">
+          <input type="radio" name="q50" id="q50_0" value="0" onchange="onAnswer(50,0)">
+          <label for="q50_0">Pas du tout vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q50" id="q50_1" value="1" onchange="onAnswer(50,1)">
+          <label for="q50_1">Plutôt faux</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q50" id="q50_2" value="2" onchange="onAnswer(50,2)">
+          <label for="q50_2">Plutôt vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q50" id="q50_3" value="3" onchange="onAnswer(50,3)">
+          <label for="q50_3">Tout à fait vrai</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="question-block" id="qblock-51">
+      <div class="question-text">
+        <span class="question-num">52.</span> Je fonctionne mieux lorsque je peux contrôler mon degré d'exposition relationnelle.
+      </div>
+      <div class="radio-group">
+        <div class="radio-option">
+          <input type="radio" name="q51" id="q51_0" value="0" onchange="onAnswer(51,0)">
+          <label for="q51_0">Pas du tout vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q51" id="q51_1" value="1" onchange="onAnswer(51,1)">
+          <label for="q51_1">Plutôt faux</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q51" id="q51_2" value="2" onchange="onAnswer(51,2)">
+          <label for="q51_2">Plutôt vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q51" id="q51_3" value="3" onchange="onAnswer(51,3)">
+          <label for="q51_3">Tout à fait vrai</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="question-block" id="qblock-52">
+      <div class="question-text">
+        <span class="question-num">53.</span> Les conflits de valeurs sont plus difficiles à gérer pour moi que les désaccords techniques.
+      </div>
+      <div class="radio-group">
+        <div class="radio-option">
+          <input type="radio" name="q52" id="q52_0" value="0" onchange="onAnswer(52,0)">
+          <label for="q52_0">Pas du tout vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q52" id="q52_1" value="1" onchange="onAnswer(52,1)">
+          <label for="q52_1">Plutôt faux</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q52" id="q52_2" value="2" onchange="onAnswer(52,2)">
+          <label for="q52_2">Plutôt vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q52" id="q52_3" value="3" onchange="onAnswer(52,3)">
+          <label for="q52_3">Tout à fait vrai</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="question-block" id="qblock-53">
+      <div class="question-text">
+        <span class="question-num">54.</span> Je me régule mieux lorsque je peux mettre du sens sur ce que je ressens.
+      </div>
+      <div class="radio-group">
+        <div class="radio-option">
+          <input type="radio" name="q53" id="q53_0" value="0" onchange="onAnswer(53,0)">
+          <label for="q53_0">Pas du tout vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q53" id="q53_1" value="1" onchange="onAnswer(53,1)">
+          <label for="q53_1">Plutôt faux</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q53" id="q53_2" value="2" onchange="onAnswer(53,2)">
+          <label for="q53_2">Plutôt vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q53" id="q53_3" value="3" onchange="onAnswer(53,3)">
+          <label for="q53_3">Tout à fait vrai</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="question-block" id="qblock-54">
+      <div class="question-text">
+        <span class="question-num">55.</span> Je peux fournir un effort soutenu même sans intérêt particulier.
+      </div>
+      <div class="radio-group">
+        <div class="radio-option">
+          <input type="radio" name="q54" id="q54_0" value="0" onchange="onAnswer(54,0)">
+          <label for="q54_0">Pas du tout vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q54" id="q54_1" value="1" onchange="onAnswer(54,1)">
+          <label for="q54_1">Plutôt faux</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q54" id="q54_2" value="2" onchange="onAnswer(54,2)">
+          <label for="q54_2">Plutôt vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q54" id="q54_3" value="3" onchange="onAnswer(54,3)">
+          <label for="q54_3">Tout à fait vrai</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="question-block" id="qblock-55">
+      <div class="question-text">
+        <span class="question-num">56.</span> Mon équilibre émotionnel dépend beaucoup de la cohérence de mon environnement.
+      </div>
+      <div class="radio-group">
+        <div class="radio-option">
+          <input type="radio" name="q55" id="q55_0" value="0" onchange="onAnswer(55,0)">
+          <label for="q55_0">Pas du tout vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q55" id="q55_1" value="1" onchange="onAnswer(55,1)">
+          <label for="q55_1">Plutôt faux</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q55" id="q55_2" value="2" onchange="onAnswer(55,2)">
+          <label for="q55_2">Plutôt vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q55" id="q55_3" value="3" onchange="onAnswer(55,3)">
+          <label for="q55_3">Tout à fait vrai</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="question-block" id="qblock-56">
+      <div class="question-text">
+        <span class="question-num">57.</span> L'autonomie est une condition importante de mon bien-être.
+      </div>
+      <div class="radio-group">
+        <div class="radio-option">
+          <input type="radio" name="q56" id="q56_0" value="0" onchange="onAnswer(56,0)">
+          <label for="q56_0">Pas du tout vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q56" id="q56_1" value="1" onchange="onAnswer(56,1)">
+          <label for="q56_1">Plutôt faux</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q56" id="q56_2" value="2" onchange="onAnswer(56,2)">
+          <label for="q56_2">Plutôt vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q56" id="q56_3" value="3" onchange="onAnswer(56,3)">
+          <label for="q56_3">Tout à fait vrai</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="question-block" id="qblock-57">
+      <div class="question-text">
+        <span class="question-num">58.</span> Je me sens en sécurité dans une relation lorsque les règles sont cohérentes.
+      </div>
+      <div class="radio-group">
+        <div class="radio-option">
+          <input type="radio" name="q57" id="q57_0" value="0" onchange="onAnswer(57,0)">
+          <label for="q57_0">Pas du tout vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q57" id="q57_1" value="1" onchange="onAnswer(57,1)">
+          <label for="q57_1">Plutôt faux</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q57" id="q57_2" value="2" onchange="onAnswer(57,2)">
+          <label for="q57_2">Plutôt vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q57" id="q57_3" value="3" onchange="onAnswer(57,3)">
+          <label for="q57_3">Tout à fait vrai</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="question-block" id="qblock-58">
+      <div class="question-text">
+        <span class="question-num">59.</span> Je récupère rapidement après une forte stimulation sociale.
+      </div>
+      <div class="radio-group">
+        <div class="radio-option">
+          <input type="radio" name="q58" id="q58_0" value="0" onchange="onAnswer(58,0)">
+          <label for="q58_0">Pas du tout vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q58" id="q58_1" value="1" onchange="onAnswer(58,1)">
+          <label for="q58_1">Plutôt faux</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q58" id="q58_2" value="2" onchange="onAnswer(58,2)">
+          <label for="q58_2">Plutôt vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q58" id="q58_3" value="3" onchange="onAnswer(58,3)">
+          <label for="q58_3">Tout à fait vrai</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="question-block" id="qblock-59">
+      <div class="question-text">
+        <span class="question-num">60.</span> Je suis plus efficace lorsque je peux avancer par étapes clairement définies.
+      </div>
+      <div class="radio-group">
+        <div class="radio-option">
+          <input type="radio" name="q59" id="q59_0" value="0" onchange="onAnswer(59,0)">
+          <label for="q59_0">Pas du tout vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q59" id="q59_1" value="1" onchange="onAnswer(59,1)">
+          <label for="q59_1">Plutôt faux</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q59" id="q59_2" value="2" onchange="onAnswer(59,2)">
+          <label for="q59_2">Plutôt vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q59" id="q59_3" value="3" onchange="onAnswer(59,3)">
+          <label for="q59_3">Tout à fait vrai</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="question-block" id="qblock-60">
+      <div class="question-text">
+        <span class="question-num">61.</span> Le sens est un moteur essentiel de mon engagement.
+      </div>
+      <div class="radio-group">
+        <div class="radio-option">
+          <input type="radio" name="q60" id="q60_0" value="0" onchange="onAnswer(60,0)">
+          <label for="q60_0">Pas du tout vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q60" id="q60_1" value="1" onchange="onAnswer(60,1)">
+          <label for="q60_1">Plutôt faux</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q60" id="q60_2" value="2" onchange="onAnswer(60,2)">
+          <label for="q60_2">Plutôt vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q60" id="q60_3" value="3" onchange="onAnswer(60,3)">
+          <label for="q60_3">Tout à fait vrai</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="question-block" id="qblock-61">
+      <div class="question-text">
+        <span class="question-num">62.</span> Je peux tolérer durablement l'incohérence relationnelle sans que cela me coûte.
+      </div>
+      <div class="radio-group">
+        <div class="radio-option">
+          <input type="radio" name="q61" id="q61_0" value="0" onchange="onAnswer(61,0)">
+          <label for="q61_0">Pas du tout vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q61" id="q61_1" value="1" onchange="onAnswer(61,1)">
+          <label for="q61_1">Plutôt faux</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q61" id="q61_2" value="2" onchange="onAnswer(61,2)">
+          <label for="q61_2">Plutôt vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q61" id="q61_3" value="3" onchange="onAnswer(61,3)">
+          <label for="q61_3">Tout à fait vrai</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="question-block" id="qblock-62">
+      <div class="question-text">
+        <span class="question-num">63.</span> Mes émotions sont généralement ressenties avec intensité.
+      </div>
+      <div class="radio-group">
+        <div class="radio-option">
+          <input type="radio" name="q62" id="q62_0" value="0" onchange="onAnswer(62,0)">
+          <label for="q62_0">Pas du tout vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q62" id="q62_1" value="1" onchange="onAnswer(62,1)">
+          <label for="q62_1">Plutôt faux</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q62" id="q62_2" value="2" onchange="onAnswer(62,2)">
+          <label for="q62_2">Plutôt vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q62" id="q62_3" value="3" onchange="onAnswer(62,3)">
+          <label for="q62_3">Tout à fait vrai</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="question-block" id="qblock-63">
+      <div class="question-text">
+        <span class="question-num">64.</span> Je préfère décider sur la base de l'efficacité mesurable plutôt que de la justesse ressentie.
+      </div>
+      <div class="radio-group">
+        <div class="radio-option">
+          <input type="radio" name="q63" id="q63_0" value="0" onchange="onAnswer(63,0)">
+          <label for="q63_0">Pas du tout vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q63" id="q63_1" value="1" onchange="onAnswer(63,1)">
+          <label for="q63_1">Plutôt faux</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q63" id="q63_2" value="2" onchange="onAnswer(63,2)">
+          <label for="q63_2">Plutôt vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q63" id="q63_3" value="3" onchange="onAnswer(63,3)">
+          <label for="q63_3">Tout à fait vrai</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="question-block" id="qblock-64">
+      <div class="question-text">
+        <span class="question-num">65.</span> Je capte rapidement les signaux faibles d'un contexte.
+      </div>
+      <div class="radio-group">
+        <div class="radio-option">
+          <input type="radio" name="q64" id="q64_0" value="0" onchange="onAnswer(64,0)">
+          <label for="q64_0">Pas du tout vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q64" id="q64_1" value="1" onchange="onAnswer(64,1)">
+          <label for="q64_1">Plutôt faux</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q64" id="q64_2" value="2" onchange="onAnswer(64,2)">
+          <label for="q64_2">Plutôt vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q64" id="q64_3" value="3" onchange="onAnswer(64,3)">
+          <label for="q64_3">Tout à fait vrai</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="question-block" id="qblock-65">
+      <div class="question-text">
+        <span class="question-num">66.</span> Je me sens apaisé·e lorsque les cadres sont clairs, même s'ils sont exigeants.
+      </div>
+      <div class="radio-group">
+        <div class="radio-option">
+          <input type="radio" name="q65" id="q65_0" value="0" onchange="onAnswer(65,0)">
+          <label for="q65_0">Pas du tout vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q65" id="q65_1" value="1" onchange="onAnswer(65,1)">
+          <label for="q65_1">Plutôt faux</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q65" id="q65_2" value="2" onchange="onAnswer(65,2)">
+          <label for="q65_2">Plutôt vrai</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" name="q65" id="q65_3" value="3" onchange="onAnswer(65,3)">
+          <label for="q65_3">Tout à fait vrai</label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cloture">
+    Merci d'avoir complété ce questionnaire. Les réponses seront interprétées dans une lecture d'ensemble, en tenant compte de votre fonctionnement habituel, et non de situations ponctuelles ou contextuelles.
+  </div>
+
+  <div class="submit-section">
+    <div class="patient-info">
+      <label for="patientName">Votre nom et prénom</label>
+      <input type="text" id="patientName" placeholder="ex : Marie Dupont">
+    </div>
+    <div class="patient-info">
+      <label for="patientDate">Date de complétion</label>
+      <input type="date" id="patientDate">
+    </div>
+    <div class="patient-info">
+      <label for="praticienEmail">Email de votre praticien</label>
+      <input type="email" id="praticienEmail" placeholder="ex : praticien@cabinet.fr">
+      <div class="field-hint">Laissez vide si vous ne connaissez pas l'adresse — vous pourrez la saisir dans votre messagerie.</div>
+    </div>
+    <button type="button" class="btn-submit" onclick="valider()">
+      ✉ Valider et envoyer mes résultats
+    </button>
+    <div id="warningMsg"></div>
+  </div>
+
+  <!-- CONFIRMATION — visible after validation -->
+  <div class="restitution" id="restitution">
+    <div class="rest-title">✓ Questionnaire complété</div>
+    <div id="confirmMsg" style="font-size:14px;color:#27500A;line-height:1.8;margin:12px 0 20px;"></div>
+    <div id="sendInfo" style="font-size:13.5px;color:#444;margin-bottom:14px;"></div>
+    <button type="button" class="rest-send-link" onclick="copyResults()" id="btnCopy">
+      ⎘ Copier les résultats
+    </button>
+    <div id="copyConfirm" style="display:none;margin-top:10px;padding:10px 14px;background:#EAF3DE;border-radius:8px;font-size:13px;color:#27500A;">
+      ✓ Résultats copiés — collez-les dans un email à votre praticien.
+    </div>
+    <p style="font-size:12px;color:#888;margin-top:14px;font-style:italic;">
+      Copiez les résultats puis collez-les dans un email à votre praticien. Ils seront analysés lors de votre prochain rendez-vous.
+    </p>
+    <p style="font-size:11.5px;color:#bbb;margin-top:6px;">
+      Ou essayez : <a id="mailtoLink" href="#" style="color:#97C459;font-size:11.5px;">ouvrir directement ma messagerie</a>
+    </p>
+    <!-- Hidden textarea holds email body for clipboard copy -->
+    <textarea id="emailBody" style="position:absolute;left:-9999px;top:-9999px;opacity:0;" readonly></textarea>
+  </div>
+
+</div>
+
+<script>
+// ── Data ────────────────────────────────────────────────
+const INV_ITEMS = [2, 16, 23, 36, 43, 50, 54, 58, 60, 63];
+const DIMS = [
+  { name: "Sens & engagement", items: [0, 2, 22, 26, 27, 32, 37, 43, 47, 53, 54, 60] },
+  { name: "Perception & sensibilité", items: [1, 9, 15, 19, 24, 38, 46, 62, 63] },
+  { name: "Cohérence & valeurs", items: [5, 12, 25, 31, 42, 52, 55, 57, 61, 65] },
+  { name: "Régulation sociale", items: [4, 10, 17, 21, 28, 29, 35, 39, 48, 49, 51, 58] },
+  { name: "Cadres & autonomie", items: [7, 14, 20, 23, 30, 36, 45, 50, 56, 59, 64] },
+  { name: "Traitement émotionnel", items: [3, 6, 11, 13, 33, 34, 40, 41, 44, 46, 53, 62] },
+];
+const OPTIONS = ['Pas du tout vrai', 'Plutôt faux', 'Plutôt vrai', 'Tout à fait vrai'];
+const TOTAL = 66;
+let answers = new Array(TOTAL).fill(null);
+let answered = 0;
+
+// Set today's date
+document.getElementById('patientDate').valueAsDate = new Date();
+
+// ── Answer tracking ──────────────────────────────────────
+function onAnswer(i, val) {
+  if (answers[i] === null) answered++;
+  answers[i] = val;
+  document.getElementById('qblock-' + i).classList.add('answered');
+  const pct = Math.round((answered / TOTAL) * 100);
+  document.getElementById('progressBar').style.width = pct + '%';
+  document.getElementById('progressLabel').textContent = answered + ' / ' + TOTAL + ' question(s) répondue(s)';
+}
+
+// ── Scoring ──────────────────────────────────────────────
+function scoredVal(i) {
+  const raw = answers[i];
+  if (raw === null) return null;
+  const v = raw + 1;
+  return INV_ITEMS.includes(i) ? (5 - v) : v;
+}
+function dimScore(items) {
+  const vals = items.map(i => scoredVal(i)).filter(v => v !== null);
+  if (!vals.length) return 0;
+  return vals.reduce((a,b) => a+b, 0) / vals.length;
+}
+function globalScore() {
+  const vals = answers.map((_,i) => scoredVal(i)).filter(v => v !== null);
+  if (!vals.length) return 0;
+  return vals.reduce((a,b) => a+b, 0) / vals.length;
+}
+
+// ── Validation & restitution ─────────────────────────────
+function valider() {
+  const unanswered = answers.map((a,i) => a === null ? i+1 : null).filter(v => v !== null);
+  if (unanswered.length > 0) {
+    document.getElementById('warningMsg').innerHTML =
+      '<div class="warning-msg">⚠ ' + unanswered.length + ' question(s) sans réponse : ' + unanswered.join(', ') + '.<br>Merci de répondre à toutes les questions avant de valider.</div>';
+    document.getElementById('warningMsg').scrollIntoView({behavior:'smooth', block:'center'});
+    return;
+  }
+  document.getElementById('warningMsg').innerHTML = '';
+
+  const name  = document.getElementById('patientName').value.trim() || '(non renseigné)';
+  const date  = document.getElementById('patientDate').value || '';
+  const email = document.getElementById('praticienEmail').value.trim();
+
+  const scores = DIMS.map(d => dimScore(d.items));
+  const labels = DIMS.map(d => d.name);
+
+  // scores and labels computed above — used only for mailto body
+
+  // ── Build mailto (compact — scores only, no full item list) ──
+  let body = 'Q1 — STRUCTURE DE FONCTIONNEMENT DE BASE\n';
+  body += 'Participant(e) : ' + name + '\n';
+  body += 'Date : ' + date + '\n\n';
+  body += 'REPONSES (1=Pas du tout vrai  2=Plutot faux  3=Plutot vrai  4=Tout a fait vrai)\n\n';
+  answers.forEach((a, i) => {
+    body += 'Q' + String(i+1).padStart(2,'0') + ' : ' + (a !== null ? (a+1) : '-') + '\n';
+  });
+
+  // Store plain text for clipboard
+  document.getElementById('emailBody').value = body;
+
+  const subject = encodeURIComponent('Q1 Fonctionnement — ' + name + ' — ' + date);
+  const bodyEnc = encodeURIComponent(body);
+  const mailto  = 'mailto:' + (email || '') + '?subject=' + subject + '&body=' + bodyEnc;
+  document.getElementById('mailtoLink').href = mailto;
+  document.getElementById('sendInfo').innerHTML = email
+    ? 'Adresse pré-remplie&nbsp;: <strong>' + email + '</strong>'
+    : 'Aucune adresse renseignée — vous pourrez la saisir dans votre messagerie.';
+
+  // ── Confirmation message ──
+  document.getElementById('confirmMsg').innerHTML =
+    'Merci ' + (name !== '(non renseigné)' ? '<strong>' + name + '</strong>' : '') + ', vos réponses ont bien été enregistrées.' +
+    (email ? '<br>Cliquez sur le bouton ci-dessous pour les envoyer à <strong>' + email + '</strong>.' :
+             '<br>Cliquez sur le bouton ci-dessous pour ouvrir votre messagerie — vous pourrez y saisir l\'adresse de votre praticien.');
+
+  // ── Show confirmation ──
+  const rest = document.getElementById('restitution');
+  rest.classList.add('visible');
+  rest.scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function copyResults() {
+  const el = document.getElementById('emailBody');
+  if (!el) return;
+  const text = el.value;
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(() => {
+      document.getElementById('copyConfirm').style.display = 'block';
+      document.getElementById('btnCopy').textContent = '✓ Copié';
+    }).catch(() => fallbackCopy(text));
+  } else {
+    fallbackCopy(text);
+  }
+}
+function fallbackCopy(text) {
+  const el = document.getElementById('emailBody');
+  el.style.display = 'block';
+  el.select();
+  try {
+    document.execCommand('copy');
+    document.getElementById('copyConfirm').style.display = 'block';
+    document.getElementById('btnCopy').textContent = '✓ Copié';
+  } catch(e) {
+    el.style.display = 'block';
+    el.focus();
+    el.select();
+  }
+}
+
+</script>
+</body>
+</html>

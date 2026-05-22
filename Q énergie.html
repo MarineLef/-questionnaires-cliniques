@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Profil energetique</title>
+<style>
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    color: #1a1a1a;
+    background: #f5f3f0;
+    padding: 20px;
+  }
+  .container {
+    max-width: 820px;
+    margin: 0 auto;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    overflow: hidden;
+  }
+  .header {
+    background: #3B6D11;
+    color: #fff;
+    padding: 32px 40px 24px;
+  }
+  .header h1 { font-size: 21px; font-weight: 600; margin-bottom: 4px; }
+  .header .subtitle { font-size: 13px; opacity: 0.80; margin-top: 4px; font-style: italic; }
+  .header .step-badge {
+    display: inline-block;
+    margin-top: 12px;
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 100px;
+    padding: 3px 14px;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .intro-box {
+    background: #EAF3DE;
+    border-left: 4px solid #639922;
+    margin: 24px 40px 0;
+    padding: 14px 18px;
+    border-radius: 6px;
+    font-size: 13.5px;
+    color: #173404;
+    line-height: 1.7;
+  }
+  .intro-box strong {
+    display: block; font-size: 13px; font-weight: 700;
+    color: #3B6D11; margin-bottom: 6px;
+    text-transform: uppercase; letter-spacing: 0.04em;
+  }
+  .consigne {
+    background: #f5faf0;
+    border-left: 4px solid #97C459;
+    margin: 16px 40px 0;
+    padding: 14px 18px;
+    border-radius: 6px;
+    font-size: 13.5px;
+    color: #27500A;
+    line-height: 1.6;
+  }
+  .consigne strong {
+    display: block; font-size: 13px; font-weight: 700;
+    color: #3B6D11; margin-bottom: 6px;
+    text-transform: uppercase; letter-spacing: 0.04em;
+  }
+  .completion-bar-wrap {
+    background: #EAF3DE; border-radius: 20px;
+    height: 8px; margin: 20px 40px 0; overflow: hidden;
+  }
+  .completion-bar { height: 100%; background: #639922; border-radius: 20px; transition: width 0.3s; width: 0%; }
+  .completion-label { font-size: 12px; color: #888; text-align: right; padding: 4px 40px 0; margin-bottom: 16px; }
+
+  .section { padding: 0 40px 30px; }
+
+  .axe-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #3B6D11;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin: 28px 0 12px;
+    padding-bottom: 6px;
+    border-bottom: 2px solid #EAF3DE;
+  }
+
+  .question-block {
+    margin-bottom: 14px; padding: 13px 16px;
+    background: #fafaf8; border: 1px solid #e8e8e4; border-radius: 8px;
+  }
+  .question-text { font-size: 14px; color: #1a1a1a; margin-bottom: 11px; line-height: 1.5; }
+  .question-num { font-weight: 700; color: #3B6D11; }
+  .radio-group { display: flex; gap: 8px; flex-wrap: wrap; }
+  .radio-option { flex: 1; min-width: 100px; }
+  .radio-option input[type="radio"] { display: none; }
+  .radio-option label {
+    display: flex; align-items: center; justify-content: center;
+    width: 100%; padding: 8px 6px;
+    border: 1.5px solid #C0DD97; border-radius: 8px; cursor: pointer;
+    font-size: 12.5px; font-weight: 500; color: #3B6D11;
+    background: #fff; transition: all 0.15s; user-select: none;
+    text-align: center; line-height: 1.3;
+  }
+  .radio-option input[type="radio"]:checked + label { background: #3B6D11; border-color: #3B6D11; color: #fff; }
+  .radio-option label:hover { border-color: #639922; background: #EAF3DE; }
+  .radio-option input[type="radio"]:checked + label:hover { background: #3B6D11; }
+
+  .cloture {
+    background: #EAF3DE; border-left: 4px solid #639922;
+    margin: 0 40px 30px; padding: 13px 18px; border-radius: 6px;
+    font-size: 13.5px; color: #27500A; font-style: italic; line-height: 1.6;
+  }
+  .submit-section {
+    padding: 30px 40px 40px;
+    background: #fafaf8;
+    border-top: 2px solid #EAF3DE;
+  }
+  .patient-info { margin-bottom: 16px; }
+  .patient-info label { display: block; font-size: 13px; font-weight: 600; color: #444; margin-bottom: 5px; }
+  .patient-info input {
+    width: 100%; padding: 9px 12px;
+    border: 1.5px solid #C0DD97; border-radius: 6px;
+    font-size: 14px; font-family: Arial, sans-serif;
+    color: #1a1a1a; background: #fff;
+  }
+  .patient-info input:focus { outline: none; border-color: #639922; }
+  .patient-info .field-hint { font-size: 11.5px; color: #888; margin-top: 4px; font-style: italic; }
+
+  .btn-submit {
+    display: inline-block; padding: 13px 32px;
+    background: #3B6D11; color: #fff; border: none;
+    border-radius: 8px; font-size: 15px; font-weight: 600;
+    cursor: pointer; font-family: Arial, sans-serif; transition: background 0.15s;
+  }
+  .btn-submit:hover { background: #639922; }
+  .btn-submit:disabled { opacity: 0.35; cursor: not-allowed; }
+
+  .email-notice {
+    display: none;
+    margin-top: 20px;
+    background: #EAF3DE;
+    border: 1.5px solid #639922;
+    border-radius: 10px;
+    padding: 20px 24px;
+    color: #173404;
+    font-size: 14px;
+    line-height: 1.7;
+  }
+  .email-notice strong { display: block; font-size: 13px; color: #3B6D11; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.04em; }
+  .email-notice a { color: #3B6D11; font-weight: 700; font-size: 15px; }
+  .email-notice .recap-table {
+    width: 100%; border-collapse: collapse;
+    font-size: 12.5px; margin-top: 16px;
+  }
+  .email-notice .recap-table th {
+    text-align: left; padding: 6px 10px;
+    background: #3B6D11; color: #fff; font-weight: 600;
+  }
+  .email-notice .recap-table td {
+    padding: 6px 10px; border-bottom: 1px solid #d4e8c0;
+  }
+  .email-notice .recap-table tr:nth-child(even) td { background: #f5faf0; }
+
+  .warning-msg {
+    background: #FFF8E1; border: 1.5px solid #F9A825;
+    border-radius: 8px; padding: 12px 16px;
+    color: #5D4037; font-size: 13.5px; margin-top: 12px;
+  }
+
+  @media (max-width: 600px) {
+    .header, .section, .submit-section { padding-left: 20px; padding-right: 20px; }
+    .intro-box, .consigne, .cloture, .completion-bar-wrap, .completion-label { margin-left: 20px; margin-right: 20px; }
+    .radio-option { min-width: 80px; }
+    .radio-option label { font-size: 11.5px; padding: 7px 4px; }
+  }
+
+  .axe-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #3B6D11;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    background: #EAF3DE;
+    border-left: 4px solid #639922;
+    padding: 8px 14px;
+    margin: 24px 0 10px;
+    border-radius: 4px;
+  }
+  .question-block.answered { border-left-color: #639922; }
+  .restitution { display: none; padding: 32px 40px 40px; background: #fff; border-top: 2px solid #EAF3DE; }
+  .restitution.visible { display: block; }
+  .rest-title { font-size: 16px; font-weight: 700; color: #3B6D11; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 4px; }
+  .btn-copy { display: inline-block; margin: 10px 0 0; background: #3B6D11; color: #fff; padding: 10px 24px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; border: none; font-family: Arial, sans-serif; }
+  .btn-copy:hover { background: #639922; }
+  @media (max-width: 600px) {
+    .restitution { padding-left: 20px; padding-right: 20px; }
+  }
+
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <div class="step-badge">Cartographie de base</div>
+    <h1 style="margin-top:10px;">Profil energetique</h1>
+    <div class="subtitle">Niveau d'energie, orientation, qualite et fonctionnement sous contrainte</div>
+  </div>
+
+  <div class="intro-box">
+    <strong>A lire avant de repondre</strong>
+    Ce questionnaire explore votre rapport naturel a l'energie — comment elle se distribue, s'oriente et se manifeste dans votre fonctionnement habituel. Il ne mesure pas votre niveau de forme actuel, ni ce que vous aimeriez etre. Il decrit comment votre energie fonctionne naturellement, dans vos conditions habituelles.
+  </div>
+
+  <div class="consigne">
+    <strong>Consigne</strong>
+    Repondez en vous appuyant sur votre fonctionnement habituel, lorsque vous allez globalement bien. Il n'y a ni bonne ni mauvaise reponse.
+  </div>
+
+  <div class="completion-bar-wrap">
+    <div class="completion-bar" id="progressBar"></div>
+  </div>
+  <div class="completion-label" id="progressLabel">0 / 56 question(s) repondue(s)</div>
+
+  <div class="section">
+<div class="axe-title">Axe 1 — Niveau global d'énergie et endurance</div>
+<div class="question-block" id="qblock-0"><div class="question-text"><span class="question-num">1.</span> J'ai naturellement beaucoup d'énergie disponible au quotidien.</div><div class="radio-group"><div class="radio-option"><input type="radio" name="q0" id="q0_0" value="0" onchange="onAnswer(0,0)"><label for="q0_0">Pas du tout vrai</label></div><div class="radio-option"><input type="radio" name="q0" id="q0_1" value="1" onchange="onAnswer(0,1)"><label for="q0_1">Plutôt faux</label></div><div class="radio-option"><input type="radio" name="q0" id="q0_2" value="2" onchange="onAnswer(0,2)"><label for="q0_2">Plutôt vrai</label></div><div class="radio-option"><input type="radio" name="q0" id="q0_3" value="3" onchange="onAnswer(0,3)"><label for="q0_3">Tout à fait vrai</label></div></div></div>
+<div class="question-block" id="qblock-1"><div class="question-text"><span class="question-num">2.</span> Je me fatigue assez vite quand l'effort se prolonge.</div><div class="radio-group"><div class="radio-option"><input type="radio" name="q1" id="q1_0" value="0" onchange="onAnswer(1,0)"><label for="q1_0">Pas du tout vrai</label></div><div class="radio-option"><input type="radio" name="q1" id="q1_1" value="1" onchange="onAnswer(1,1)"><label for="q1_1">Plutôt faux</label></div><div class="radio-option"><input type="radio" name="q1" id="q1_2" value="2" onchange="onAnswer(1,2)"><label for="q1_2">Plutôt vrai</label></div><div class="radio-option"><input type="radio" name="q1" id="q1_3" value="3" onchange="onAnswer(1,3)"><label for="q1_3">Tout à fait vrai</label></div></div></div>
+<div class="question-block" id="qblock-2"><div class="question-text"><span class="question-num">3.</span> Mon niveau d'énergie est globalement stable d'un jour à l'autre.</div><div class="radio-group"><div class="radio-option"><input type="radio" name="q2" id="q2_0" value="0" onchange="onAnswer(2,0)"><label for="q2_0">Pas du tout vrai</label></div><div class="radio-option"><input type="radio" name="q2" id="q2_1" value="1" onchange="onAnswer(2,1)"><label for="q2_1">Plutôt faux</label></div><div class="radio-option"><input type="radio" name="q2" id="q2_2" value="2" onchange="onAnswer(2,2)"><label for="q2_2">Plutôt vrai</label></div><div class="radio-option"><input type="radio" name="q2" id="q2_3" value="3" onchange="onAnswer(2,3)"><label for="q2_3">Tout à fait vrai</label></div></div></div>
+<div class="question-block" id="qblock-3"><div class="question-text"><span class="question-num">4.</span> Il me faut du temps pour récupérer après une période d'effort intense.</div><div class="radio-group"><div class="radio-option"><input type="radio" name="q3" id="q3_0" value="0" onchange="onAnswer(3,0)"><label for="q3_0">Pas du tout vrai</label></div><div class="radio-option"><input type="radio" name="q3" id="q3_1" value="1" onchange="onAnswer(3,1)"><label for="q3_1">Plutôt faux</label></div><div class="radio-option"><input type="radio" name="q3" id="q3_2" value="2" onchange="onAnswer(3,2)"><label for="q3_2">Plutôt vrai</label></div><div class="radio-option"><input type="radio" name="q3" id="q3_3" value="3" onchange="onAnswer(3,3)"><label for="q3_3">Tout à fait vrai</label></div></div></div>
+<div class="question-block" id="qblock-4"><div class="question-text"><span class="question-num">5.</span> Je fonctionne par vagues — des périodes d'intensité suivies de périodes où j'ai besoin de me retirer.</div><div class="radio-group"><div class="radio-option"><input type="radio" name="q4" id="q4_0" value="0" onchange="onAnswer(4,0)"><label for="q4_0">Pas du tout vrai</label></div><div class="radio-option"><input type="radio" name="q4" id="q4_1" value="1" onchange="onAnswer(4,1)"><label for="q4_1">Plutôt faux</label></div><div class="radio-option"><input type="radio" name="q4" id="q4_2" value="2" onchange="onAnswer(4,2)"><label for="q4_2">Plutôt vrai</label></div><div class="radio-option"><input type="radio" name="q4" id="q4_3" value="3" onchange="onAnswer(4,3)"><label for="q4_3">Tout à fait vrai</label></div></div></div>
+<div class="question-block" id="qblock-5"><div class="question-text"><span class="question-num">6.</span> En fin de journée, mon niveau d'énergie est nettement inférieur à ce qu'il était le matin.</div><div class="radio-group"><div class="radio-option"><input type="radio" name="q5" id="q5_0" value="0" onchange="onAnswer(5,0)"><label for="q5_0">Pas du tout vrai</label></div><div class="radio-option"><input type="radio" name="q5" id="q5_1" value="1" onchange="onAnswer(5,1)"><label for="q5_1">Plutôt faux</label></div><div class="radio-option"><input type="radio" name="q5" id="q5_2" value="2" onchange="onAnswer(5,2)"><label for="q5_2">Plutôt vrai</label></div><div class="radio-option"><input type="radio" name="q5" id="q5_3" value="3" onchange="onAnswer(5,3)"><label for="q5_3">Tout à fait vrai</label></div></div></div>
+<div class="question-block" id="qblock-6"><div class="question-text"><span class="question-num">7.</span> Je me disperse difficilement sur plusieurs projets exigeants en même temps.</div><div class="radio-group"><div class="radio-option"><input type="radio" name="q6" id="q6_0" value="0" onchange="onAnswer(6,0)"><label for="q6_0">Pas du tout vrai</label></div><div class="radio-option"><input type="radio" name="q6" id="q6_1" value="1" onchange="onAnswer(6,1)"><label for="q6_1">Plutôt faux</label></div><div class="radio-option"><input type="radio" name="q6" id="q6_2" value="2" onchange="onAnswer(6,2)"><label for="q6_2">Plutôt vrai</label></div><div class="radio-option"><input type="radio" name="q6" id="q6_3" value="3" onchange="onAnswer(6,3)"><label for="q6_3">Tout à fait vrai</label></div></div></div>
+<div class="question-block" id="qblock-7"><div class="question-text"><span class="question-num">8.</span> Quand quelque chose m'engage vraiment, mon énergie semble se renouveler d'elle-même.</div><div class="radio-group"><div class="radio-option"><input type="radio" name="q7" id="q7_0" value="0" onchange="onAnswer(7,0)"><label for="q7_0">Pas du tout vrai</label></div><div class="radio-option"><input type="radio" name="q7" id="q7_1" value="1" onchange="onAnswer(7,1)"><label for="q7_1">Plutôt faux</label></div><div class="radio-option"><input type="radio" name="q7" id="q7_2" value="2" onchange="onAnswer(7,2)"><label for="q7_2">Plutôt vrai</label></div><div class="radio-option"><input type="radio" name="q7" id="q7_3" value="3" onchange="onAnswer(7,3)"><label for="q7_3">Tout à fait vrai</label></div></div></div>
+<div class="axe-title">Axe 2 — Orientation de l'énergie : dedans ou dehors</div>
+<div class="question-block" id="qblock-8"><div class="question-text"><span class="question-num">9.</span> Quand je travaille sur quelque chose, mon activité est surtout visible de l'extérieur.</div><div class="radio-group"><div class="radio-option"><input type="radio" name="q8" id="q8_0" value="0" onchange="onAnswer(8,0)"><label for="q8_0">Pas du tout vrai</label></div><div class="radio-option"><input type="radio" name="q8" id="q8_1" value="1" onchange="onAnswer(8,1)"><label for="q8_1">Plutôt faux</label></div><div class="radio-option"><input type="radio" name="q8" id="q8_2" value="2" onchange="onAnswer(8,2)"><label for="q8_2">Plutôt vrai</label></div><div class="radio-option"><input type="radio" name="q8" id="q8_3" value="3" onchange="onAnswer(8,3)"><label for="q8_3">Tout à fait vrai</label></div></div></div>
+<div class="question-block" id="qblock-9"><div class="question-text"><span class="question-num">10.</span> Je prépare mentalement longuement avant d'agir — l'essentiel du travail se passe dans ma tête avant de se voir.</div><div class="radio-group"><div class="radio-option"><input type="radio" name="q9" id="q9_0" value="0" onchange="onAnswer(9,0)"><label for="q9_0">Pas du tout vrai</label></div><div class="radio-option"><input type="radio" name="q9" id="q9_1" value="1" onchange="onAnswer(9,1)"><label for="q9_1">Plutôt faux</label></div><div class="radio-option"><input type="radio" name="q9" id="q9_2" value="2" onchange="onAnswer(9,2)"><label for="q9_2">Plutôt vrai</label></div><div class="radio-option"><input type="radio" name="q9" id="q9_3" value="3" onchange="onAnswer(9,3)"><label for="q9_3">Tout à fait vrai</label></div></div></div>
+<div class="question-block" id="qblock-10"><div class="question-text"><span class="question-num">11.</span> J'ai besoin de passer à l'action pour me sentir productif.</div><div class="radio-group"><div class="radio-option"><input type="radio" name="q10" id="q10_0" value="0" onchange="onAnswer(10,0)"><label for="q10_0">Pas du tout vrai</label></div><div class="radio-option"><input type="radio" name="q10" id="q10_1" value="1" onchange="onAnswer(10,1)"><label for="q10_1">Plutôt faux</label></div><div class="radio-option"><input type="radio" name="q10" id="q10_2" value="2" onchange="onAnswer(10,2)"><label for="q10_2">Plutôt vrai</label></div><div class="radio-option"><input type="radio" name="q10" id="q10_3" value="3" onchange="onAnswer(10,3)"><label for="q10_3">Tout à fait vrai</label></div></div></div>
+<div class="question-block" id="qblock-11"><div class="question-text"><span class="question-num">12.</span> On me perçoit parfois comme peu actif alors que je suis en pleine réflexion intérieure.</div><div class="radio-group"><div class="radio-option"><input type="radio" name="q11" id="q11_0" value="0" onchange="onAnswer(11,0)"><label for="q11_0">Pas du tout vrai</label></div><div class="radio-option"><input type="radio" name="q11" id="q11_1" value="1" onchange="onAnswer(11,1)"><label for="q11_1">Plutôt faux</label></div><div class="radio-option"><input type="radio" name="q11" id="q11_2" value="2" onchange="onAnswer(11,2)"><label for="q11_2">Plutôt vrai</label></div><div class="radio-option"><input type="radio" name="q11" id="q11_3" value="3" onchange="onAnswer(11,3)"><label for="q11_3">Tout à fait vrai</label></div></div></div>
+<div class="question-block" id="qblock-12"><div class="question-text"><span class="question-num">13.</span> Je pense mieux en faisant qu'en réfléchissant avant de faire.</div><div class="radio-group"><div class="radio-option"><input type="radio" name="q12" id="q12_0" value="0" onchange="onAnswer(12,0)"><label for="q12_0">Pas du tout vrai</label></div><div class="radio-option"><input type="radio" name="q12" id="q12_1" value="1" onchange="onAnswer(12,1)"><label for="q12_1">Plutôt faux</label></div><div class="radio-option"><input type="radio" name="q12" id="q12_2" value="2" onchange="onAnswer(12,2)"><label for="q12_2">Plutôt vrai</label></div><div class="radio-option"><input type="radio" name="q12" id="q12_3" value="3" onchange="onAnswer(12,3)"><label for="q12_3">Tout à fait vrai</label></div></div></div>
+<div class="question-block" id="qblock-13"><div class="question-text"><span class="question-num">14.</span> Mon énergie travaille souvent en silence, de façon invisible pour les autres.</div><div class="radio-group"><div class="radio-option"><input type="radio" name="q13" id="q13_0" value="0" onchange="onAnswer(13,0)"><label for="q13_0">Pas du tout vrai</label></div><div class="radio-option"><input type="radio" name="q13" id="q13_1" value="1" onchange="onAnswer(13,1)"><label for="q13_1">Plutôt faux</label></div><div class="radio-option"><input type="radio" name="q13" id="q13_2" value="2" onchange="onAnswer(13,2)"><label for="q13_2">Plutôt vrai</label></div><div class="radio-option"><input type="radio" name="q13" id="q13_3" value="3" onchange="onAnswer(13,3)"><label for="q13_3">Tout à fait vrai</label></div></div></div>
+<div class="question-block" id="qblock-14"><div class="question-text"><span class="question-num">15.</span> J'ai tendance à agir rapidement plutôt qu'à laisser les choses mûrir.</div><div class="radio-group"><div class="radio-option"><input type="radio" name="q14" id="q14_0" value="0" onchange="onAnswer(14,0)"><label for="q14_0">Pas du tout vrai</label></div><div class="radio-option"><input type="radio" name="q14" id="q14_1" value="1" onchange="onAnswer(14,1)"><label for="q14_1">Plutôt faux</label></div><div class="radio-option"><input type="radio" name="q14" id="q14_2" value="2" onchange="onAnswer(14,2)"><label for="q14_2">Plutôt vrai</label></div><div class="radio-option"><input type="radio" name="q14" id="q14_3" value="3" onchange="onAnswer(14,3)"><label for="q14_3">Tout à fait vrai</label></div></div></div>
+<div class="question-block" id="qblock-15"><div class="question-text"><span class="question-num">16.</span> Quand j'agis, c'est généralement après une longue phase de maturation intérieure.</div><div class="radio-group"><div class="radio-option"><input type="radio" name="q15" id="q15_0" value="0" onchange="onAnswer(15,0)"><label for="q15_0">Pas du tout vrai</label></div><div class="radio-option"><input type="radio" name="q15" id="q15_1" value="1" onchange="onAnswer(15,1)"><label for="q15_1">Plutôt faux</label></div><div class="radio-option"><input type="radio" name="q15" id="q15_2" value="2" onchange="onAnswer(15,2)"><label for="q15_2">Plutôt vrai</label></div><div class="radio-option"><input type="radio" name="q15" id="q15_3" value="3" onchange="onAnswer(15,3)"><label for="q15_3">Tout à fait vrai</label></div></div></div>
+<div class="question-block" id="qblock-16"><div class="question-text"><span class="question-num">17.</span> Les autres me voient plus actif que je ne me sens réellement à l'intérieur.</div><div class="radio-group"><div class="radio-option"><input type="radio" name="q16" id="q16_0" value="0" onchange="onAnswer(16,0)"><label for="q16_0">Pas du tout vrai</label></div><div class="radio-option"><input type="radio" name="q16" id="q16_1" value="1" onchange="onAnswer(16,1)"><label for="q16_1">Plutôt faux</label></div><div class="radio-option"><input type="radio" name="q16" id="q16_2" value="2" onchange="onAnswer(16,2)"><label for="q16_2">Plutôt vrai</label></div><div class="radio-option"><input type="radio" name="q16" id="q16_3" value="3" onchange="onAnswer(16,3)"><label for="q16_3">Tout à fait vrai</label></div></div></div>
+<div class="question-block" id="qblock-17"><div class="question-text"><span class="question-num">18.</span> Je me sens plus à l'aise dans la réflexion que dans l'action concrète.</div><div class="radio-group"><div class="radio-option"><input type="radio" name="q17" id="q17_0" value="0" onchange="onAnswer(17,0)"><label for="q17_0">Pas du tout vrai</label></div><div class="radio-option"><input type="radio" name="q17" id="q17_1" value="1" onchange="onAnswer(17,1)"><label for="q17_1">Plutôt faux</label></div><div class="radio-option"><input type="radio" name="q17" id="q17_2" value="2" onchange="onAnswer(17,2)"><label for="q17_2">Plutôt vrai</label></div><div class="radio-option"><input type="radio" name="q17" id="q17_3" value="3" onchange="onAnswer(17,3)"><label for="q17_3">Tout à fait vrai</label></div></div></div>
+<div class="axe-title">Axe 3 — Qualité de l'énergie : ciblée ou dispersée</div>
+<div class="question-block" id="qblock-18"><div class="question-text"><span class="question-num">19.</span> Quand je m'engage dans quelque chose, je tends à m'y concentrer pleinement plutôt qu'à faire plusieurs choses à la fois.</div><div class="radio-group"><div class="radio-option"><input type="radio" name="q18" id="q18_0" value="0" onchange="onAnswer(18,0)"><label for="q18_0">Pas du tout vrai</label></div><div class="radio-option"><input type="radio" name="q18" id="q18_1" value="1" onchange="onAnswer(18,1)"><label for="q18_1">Plutôt faux</label></div><div class="radio-option"><input type="radio" name="q18" id="q18_2" value="2" onchange="onAnswer(18,2)"><label for="q18_2">Plutôt vrai</label></div><div class="radio-option"><input type="radio" name="q18" id="q18_3" value="3" onchange="onAnswer(18,3)"><label for="q18_3">Tout à fait vrai</label></div></div></div>
+<div class="question-block" id="qblock-19"><div class="question-text"><span class="question-num">20.</span> J'ai tendance à démarrer beaucoup de projets sans toujours les mener à terme.</div><div class="radio-group"><div class="radio-option"><input type="radio" name="q19" id="q19_0" value="0" onchange="onAnswer(19,0)"><label for="q19_0">Pas du tout vrai</label></div><div class="radio-option"><input type="radio" name="q19" id="q19_1" value="1" onchange="onAnswer(19,1)"><label for="q19_1">Plutôt faux</label></div><div class="radio-option"><input type="radio" name="q19" id="q19_2" value="2" onchange="onAnswer(19,2)"><label for="q19_2">Plutôt vrai</label></div><div class="radio-option"><input type="radio" name="q19" id="q19_3" value="3" onchange="onAnswer(19,3)"><label for="q19_3">Tout à fait vrai</label></div></div></div>
+<div class="question-block" id="qblock-20"><div class="question-text"><span class="question-num">21.</span> Mon énergie est plus efficace quand elle est concentrée sur un seul objectif à la fois.</div><div class="radio-group"><div class="radio-option"><input type="radio" name="q20" id="q20_0" value="0" onchange="onAnswer(20,0)"><label for="q20_0">Pas du tout vrai</label></div><div class="radio-option"><input type="radio" name="q20" id="q20_1" value="1" onchange="onAnswer(20,1)"><label for="q20_1">Plutôt faux</label></div><div class="radio-option"><input type="radio" name="q20" id="q20_2" value="2" onchange="onAnswer(20,2)"><label for="q20_2">Plutôt vrai</label></div><div class="radio-option"><input type="radio" name="q20" id="q20_3" value="3" onchange="onAnswer(20,3)"><label for="q20_3">Tout à fait vrai</label></div></div></div>
+<div class="question-block" id="qblock-21"><div class="question-text"><span class="question-num">22.</span> Je passe facilement d'une tâche à une autre sans perdre en efficacité.</div><div class="radio-group"><div class="radio-option"><input type="radio" name="q21" id="q21_0" value="0" onchange="onAnswer(21,0)"><label for="q21_0">Pas du tout vrai</label></div><div class="radio-option"><input type="radio" name="q21" id="q21_1" value="1" onchange="onAnswer(21,1)"><label for="q21_1">Plutôt faux</label></div><div class="radio-option"><input type="radio" name="q21" id="q21_2" value="2" onchange="onAnswer(21,2)"><label for="q21_2">Plutôt vrai</label></div><div class="radio-option"><input type="radio" name="q21" id="q21_3" value="3" onchange="onAnswer(21,3)"><label for="q21_3">Tout à fait vrai</label></div></div></div>
+<div class="question-block" id="qblock-22"><div class="question-text"><span class="question-num">23.</span> Je préfère faire peu de choses mais les faire vraiment bien.</div><div class="radio-group"><div class="radio-option"><input type="radio" name="q22" id="q22_0" value="0" onchange="onAnswer(22,0)"><label for="q22_0">Pas du tout vrai</label></div><div class="radio-option"><input type="radio" name="q22" id="q22_1" value="1" onchange="onAnswer(22,1)"><label for="q22_1">Plutôt faux</label></div><div class="radio-option"><input type="radio" name="q22" id="q22_2" value="2" onchange="onAnswer(22,2)"><label for="q22_2">Plutôt vrai</label></div><div class="radio-option"><input type="radio" name="q22" id="q22_3" value="3" onchange="onAnswer(22,3)"><label for="q22_3">Tout à fait vrai</label></div></div></div>
+<div class="question-block" id="qblock-23"><div class="question-text"><span class="question-num">24.</span> J'ai du mal à rester concentré longtemps sur une seule chose.</div><div class="radio-group"><div class="radio-option"><input type="radio" name="q23" id="q23_0" value="0" onchange="onAnswer(23,0)"><label for="q23_0">Pas du tout vrai</label></div><div class="radio-option"><input type="radio" name="q23" id="q23_1" value="1" onchange="onAnswer(23,1)"><label for="q23_1">Plutôt faux</label></div><div class="radio-option"><input type="radio" name="q23" id="q23_2" value="2" onchange="onAnswer(23,2)"><label for="q23_2">Plutôt vrai</label></div><div class="radio-option"><input type="radio" name="q23" id="q23_3" value="3" onchange="onAnswer(23,3)"><label for="q23_3">Tout à fait vrai</label></div></div></div>
+<div class="question-block" id="qblock-24"><div class="question-text"><span class="question-num">25.</span> Quand j'agis, mon énergie est ciblée — je vais droit au but sans me disperser.</div><div class="radio-group"><div class="radio-option"><input type="radio" name="q24" id="q24_0" value="0" onchange="onAnswer(24,0)"><label for="q24_0">Pas du tout vrai</label></div><div class="radio-option"><input type="radio" name="q24" id="q24_1" value="1" onchange="onAnswer(24,1)"><label for="q24_1">Plutôt faux</label></div><div class="radio-option"><input type="radio" name="q24" id="q24_2" value="2" onchange="onAnswer(24,2)"><label for="q24_2">Plutôt vrai</label></div><div class="radio-option"><input type="radio" name="q24" id="q24_3" value="3" onchange="onAnswer(24,3)"><label for="q24_3">Tout à fait vrai</label></div></div></div>
+<div class="question-block" id="qblock-25"><div class="question-text"><span class="question-num">26.</span> Je me retrouve souvent avec trop de choses en cours simultanément.</div><div class="radio-group"><div class="radio-option"><input type="radio" name="q25" id="q25_0" value="0" onchange="onAnswer(25,0)"><label for="q25_0">Pas du tout vrai</label></div><div class="radio-option"><input type="radio" name="q25" id="q25_1" value="1" onchange="onAnswer(25,1)"><label for="q25_1">Plutôt faux</label></div><div class="radio-option"><input type="radio" name="q25" id="q25_2" value="2" onchange="onAnswer(25,2)"><label for="q25_2">Plutôt vrai</label></div><div class="radio-option"><input type="radio" name="q25" id="q25_3" value="3" onchange="onAnswer(25,3)"><label for="q25_3">Tout à fait vrai</label></div></div></div>
+<div class="question-block" id="qblock-26"><div class="question-text"><span class="question-num">27.</span> Je produis mon meilleur travail quand je peux me consacrer entièrement à une seule chose.</div><div class="radio-group"><div class="radio-option"><input type="radio" name="q26" id="q26_0" value="0" onchange="onAnswer(26,0)"><label for="q26_0">Pas du tout vrai</label></div><div class="radio-option"><input type="radio" name="q26" id="q26_1" value="1" onchange="onAnswer(26,1)"><label for="q26_1">Plutôt faux</label></div><div class="radio-option"><input type="radio" name="q26" id="q26_2" value="2" onchange="onAnswer(26,2)"><label for="q26_2">Plutôt vrai</label></div><div class="radio-option"><input type="radio" name="q26" id="q26_3" value="3" onchange="onAnswer(26,3)"><label for="q26_3">Tout à fait vrai</label></div></div></div>
+<div class="question-block" id="qblock-27"><div class="question-text"><span class="question-num">28.</span> Mon énergie se disperse facilement face à de nombreuses sollicitations.</div><div class="radio-group"><div class="radio-option"><input type="radio" name="q27" id="q27_0" value="0" onchange="onAnswer(27,0)"><label for="q27_0">Pas du tout vrai</label></div><div class="radio-option"><input type="radio" name="q27" id="q27_1" value="1" onchange="onAnswer(27,1)"><label for="q27_1">Plutôt faux</label></div><div class="radio-option"><input type="radio" name="q27" id="q27_2" value="2" onchange="onAnswer(27,2)"><label for="q27_2">Plutôt vrai</label></div><div class="radio-option"><input type="radio" name="q27" id="q27_3" value="3" onchange="onAnswer(27,3)"><label for="q27_3">Tout à fait vrai</label></div></div></div>
+<div class="axe-title">Axe 4 — Écart entre l'énergie visible et l'activité intérieure réelle</div>
+<div class="question-block" id="qblock-28"><div class="question-text"><span class="question-num">29.</span> Ce que les autres voient de mon énergie correspond assez bien à ce que je vis réellement à l'intérieur.</div><div class="radio-group"><div class="radio-option"><input type="radio" name="q28" id="q28_0" value="0" onchange="onAnswer(28,0)"><label for="q28_0">Pas du tout vrai</label></div><div class="radio-option"><input type="radio" name="q28" id="q28_1" value="1" onchange="onAnswer(28,1)"><label for="q28_1">Plutôt faux</label></div><div class="radio-option"><input type="radio" name="q28" id="q28_2" value="2" onchange="onAnswer(28,2)"><label for="q28_2">Plutôt vrai</label></div><div class="radio-option"><input type="radio" name="q28" id="q28_3" value="3" onchange="onAnswer(28,3)"><label for="q28_3">Tout à fait vrai</label></div></div></div>
+<div class="question-block" id="qblock-29"><div class="question-text"><span class="question-num">30.</span> On me perçoit souvent comme plus calme ou passif que je ne le suis intérieurement.</div><div class="radio-group"><div class="radio-option"><input type="radio" name="q29" id="q29_0" value="0" onchange="onAnswer(29,0)"><label for="q29_0">Pas du tout vrai</label></div><div class="radio-option"><input type="radio" name="q29" id="q29_1" value="1" onchange="onAnswer(29,1)"><label for="q29_1">Plutôt faux</label></div><div class="radio-option"><input type="radio" name="q29" id="q29_2" value="2" onchange="onAnswer(29,2)"><label for="q29_2">Plutôt vrai</label></div><div class="radio-option"><input type="radio" name="q29" id="q29_3" value="3" onchange="onAnswer(29,3)"><label for="q29_3">Tout à fait vrai</label></div></div></div>
+<div class="question-block" id="qblock-30"><div class="question-text"><span class="question-num">31.</span> J'ai l'impression que mon activité intérieure est rarement visible de l'extérieur.</div><div class="radio-group"><div class="radio-option"><input type="radio" name="q30" id="q30_0" value="0" onchange="onAnswer(30,0)"><label for="q30_0">Pas du tout vrai</label></div><div class="radio-option"><input type="radio" name="q30" id="q30_1" value="1" onchange="onAnswer(30,1)"><label for="q30_1">Plutôt faux</label></div><div class="radio-option"><input type="radio" name="q30" id="q30_2" value="2" onchange="onAnswer(30,2)"><label for="q30_2">Plutôt vrai</label></div><div class="radio-option"><input type="radio" name="q30" id="q30_3" value="3" onchange="onAnswer(30,3)"><label for="q30_3">Tout à fait vrai</label></div></div></div>
+<div class="question-block" id="qblock-31"><div class="question-text"><span class="question-num">32.</span> Les autres surestiment souvent mon niveau d'énergie par rapport à ce que je ressens vraiment.</div><div class="radio-group"><div class="radio-option"><input type="radio" name="q31" id="q31_0" value="0" onchange="onAnswer(31,0)"><label for="q31_0">Pas du tout vrai</label></div><div class="radio-option"><input type="radio" name="q31" id="q31_1" value="1" onchange="onAnswer(31,1)"><label for="q31_1">Plutôt faux</label></div><div class="radio-option"><input type="radio" name="q31" id="q31_2" value="2" onchange="onAnswer(31,2)"><label for="q31_2">Plutôt vrai</label></div><div class="radio-option"><input type="radio" name="q31" id="q31_3" value="3" onchange="onAnswer(31,3)"><label for="q31_3">Tout à fait vrai</label></div></div></div>
+<div class="question-block" id="qblock-32"><div class="question-text"><span class="question-num">33.</span> Je donne parfois l'impression d'être débordé alors que je gère bien intérieurement.</div><div class="radio-group"><div class="radio-option"><input type="radio" name="q32" id="q32_0" value="0" onchange="onAnswer(32,0)"><label for="q32_0">Pas du tout vrai</label></div><div class="radio-option"><input type="radio" name="q32" id="q32_1" value="1" onchange="onAnswer(32,1)"><label for="q32_1">Plutôt faux</label></div><div class="radio-option"><input type="radio" name="q32" id="q32_2" value="2" onchange="onAnswer(32,2)"><label for="q32_2">Plutôt vrai</label></div><div class="radio-option"><input type="radio" name="q32" id="q32_3" value="3" onchange="onAnswer(32,3)"><label for="q32_3">Tout à fait vrai</label></div></div></div>
+<div class="question-block" id="qblock-33"><div class="question-text"><span class="question-num">34.</span> Mon entourage est souvent surpris quand je leur décris ce qui se passe vraiment en moi.</div><div class="radio-group"><div class="radio-option"><input type="radio" name="q33" id="q33_0" value="0" onchange="onAnswer(33,0)"><label for="q33_0">Pas du tout vrai</label></div><div class="radio-option"><input type="radio" name="q33" id="q33_1" value="1" onchange="onAnswer(33,1)"><label for="q33_1">Plutôt faux</label></div><div class="radio-option"><input type="radio" name="q33" id="q33_2" value="2" onchange="onAnswer(33,2)"><label for="q33_2">Plutôt vrai</label></div><div class="radio-option"><input type="radio" name="q33" id="q33_3" value="3" onchange="onAnswer(33,3)"><label for="q33_3">Tout à fait vrai</label></div></div></div>
+<div class="question-block" id="qblock-34"><div class="question-text"><span class="question-num">35.</span> Je me sens incompris dans mon rapport à l'énergie — ce que je vis ne correspond pas à ce que les autres perçoivent.</div><div class="radio-group"><div class="radio-option"><input type="radio" name="q34" id="q34_0" value="0" onchange="onAnswer(34,0)"><label for="q34_0">Pas du tout vrai</label></div><div class="radio-option"><input type="radio" name="q34" id="q34_1" value="1" onchange="onAnswer(34,1)"><label for="q34_1">Plutôt faux</label></div><div class="radio-option"><input type="radio" name="q34" id="q34_2" value="2" onchange="onAnswer(34,2)"><label for="q34_2">Plutôt vrai</label></div><div class="radio-option"><input type="radio" name="q34" id="q34_3" value="3" onchange="onAnswer(34,3)"><label for="q34_3">Tout à fait vrai</label></div></div></div>
+<div class="question-block" id="qblock-35"><div class="question-text"><span class="question-num">36.</span> Il y a peu d'écart entre la façon dont je me perçois et la façon dont les autres me perçoivent en termes d'énergie.</div><div class="radio-group"><div class="radio-option"><input type="radio" name="q35" id="q35_0" value="0" onchange="onAnswer(35,0)"><label for="q35_0">Pas du tout vrai</label></div><div class="radio-option"><input type="radio" name="q35" id="q35_1" value="1" onchange="onAnswer(35,1)"><label for="q35_1">Plutôt faux</label></div><div class="radio-option"><input type="radio" name="q35" id="q35_2" value="2" onchange="onAnswer(35,2)"><label for="q35_2">Plutôt vrai</label></div><div class="radio-option"><input type="radio" name="q35" id="q35_3" value="3" onchange="onAnswer(35,3)"><label for="q35_3">Tout à fait vrai</label></div></div></div>
+<div class="axe-title">Axe 5 — Rapport au corps : allié ou oublié</div>
+<div class="question-block" id="qblock-36"><div class="question-text"><span class="question-num">37.</span> Je perçois facilement les signaux que mon corps m'envoie — fatigue, tension, saturation.</div><div class="radio-group"><div class="radio-option"><input type="radio" name="q36" id="q36_0" value="0" onchange="onAnswer(36,0)"><label for="q36_0">Pas du tout vrai</label></div><div class="radio-option"><input type="radio" name="q36" id="q36_1" value="1" onchange="onAnswer(36,1)"><label for="q36_1">Plutôt faux</label></div><div class="radio-option"><input type="radio" name="q36" id="q36_2" value="2" onchange="onAnswer(36,2)"><label for="q36_2">Plutôt vrai</label></div><div class="radio-option"><input type="radio" name="q36" id="q36_3" value="3" onchange="onAnswer(36,3)"><label for="q36_3">Tout à fait vrai</label></div></div></div>
+<div class="question-block" id="qblock-37"><div class="question-text"><span class="question-num">38.</span> Il m'arrive de réaliser tardivement que mon corps était épuisé depuis un moment.</div><div class="radio-group"><div class="radio-option"><input type="radio" name="q37" id="q37_0" value="0" onchange="onAnswer(37,0)"><label for="q37_0">Pas du tout vrai</label></div><div class="radio-option"><input type="radio" name="q37" id="q37_1" value="1" onchange="onAnswer(37,1)"><label for="q37_1">Plutôt faux</label></div><div class="radio-option"><input type="radio" name="q37" id="q37_2" value="2" onchange="onAnswer(37,2)"><label for="q37_2">Plutôt vrai</label></div><div class="radio-option"><input type="radio" name="q37" id="q37_3" value="3" onchange="onAnswer(37,3)"><label for="q37_3">Tout à fait vrai</label></div></div></div>
+<div class="question-block" id="qblock-38"><div class="question-text"><span class="question-num">39.</span> Je prends naturellement soin de mon corps — sommeil, alimentation, mouvement — comme d'une ressource importante.</div><div class="radio-group"><div class="radio-option"><input type="radio" name="q38" id="q38_0" value="0" onchange="onAnswer(38,0)"><label for="q38_0">Pas du tout vrai</label></div><div class="radio-option"><input type="radio" name="q38" id="q38_1" value="1" onchange="onAnswer(38,1)"><label for="q38_1">Plutôt faux</label></div><div class="radio-option"><input type="radio" name="q38" id="q38_2" value="2" onchange="onAnswer(38,2)"><label for="q38_2">Plutôt vrai</label></div><div class="radio-option"><input type="radio" name="q38" id="q38_3" value="3" onchange="onAnswer(38,3)"><label for="q38_3">Tout à fait vrai</label></div></div></div>
+<div class="question-block" id="qblock-39"><div class="question-text"><span class="question-num">40.</span> Quand je suis absorbé par une réflexion ou un projet, j'oublie facilement les besoins de mon corps.</div><div class="radio-group"><div class="radio-option"><input type="radio" name="q39" id="q39_0" value="0" onchange="onAnswer(39,0)"><label for="q39_0">Pas du tout vrai</label></div><div class="radio-option"><input type="radio" name="q39" id="q39_1" value="1" onchange="onAnswer(39,1)"><label for="q39_1">Plutôt faux</label></div><div class="radio-option"><input type="radio" name="q39" id="q39_2" value="2" onchange="onAnswer(39,2)"><label for="q39_2">Plutôt vrai</label></div><div class="radio-option"><input type="radio" name="q39" id="q39_3" value="3" onchange="onAnswer(39,3)"><label for="q39_3">Tout à fait vrai</label></div></div></div>
+<div class="question-block" id="qblock-40"><div class="question-text"><span class="question-num">41.</span> Mon corps est pour moi une source d'information fiable sur mon état intérieur.</div><div class="radio-group"><div class="radio-option"><input type="radio" name="q40" id="q40_0" value="0" onchange="onAnswer(40,0)"><label for="q40_0">Pas du tout vrai</label></div><div class="radio-option"><input type="radio" name="q40" id="q40_1" value="1" onchange="onAnswer(40,1)"><label for="q40_1">Plutôt faux</label></div><div class="radio-option"><input type="radio" name="q40" id="q40_2" value="2" onchange="onAnswer(40,2)"><label for="q40_2">Plutôt vrai</label></div><div class="radio-option"><input type="radio" name="q40" id="q40_3" value="3" onchange="onAnswer(40,3)"><label for="q40_3">Tout à fait vrai</label></div></div></div>
+<div class="question-block" id="qblock-41"><div class="question-text"><span class="question-num">42.</span> J'ai tendance à ignorer les signaux physiques de fatigue tant que je peux encore fonctionner.</div><div class="radio-group"><div class="radio-option"><input type="radio" name="q41" id="q41_0" value="0" onchange="onAnswer(41,0)"><label for="q41_0">Pas du tout vrai</label></div><div class="radio-option"><input type="radio" name="q41" id="q41_1" value="1" onchange="onAnswer(41,1)"><label for="q41_1">Plutôt faux</label></div><div class="radio-option"><input type="radio" name="q41" id="q41_2" value="2" onchange="onAnswer(41,2)"><label for="q41_2">Plutôt vrai</label></div><div class="radio-option"><input type="radio" name="q41" id="q41_3" value="3" onchange="onAnswer(41,3)"><label for="q41_3">Tout à fait vrai</label></div></div></div>
+<div class="question-block" id="qblock-42"><div class="question-text"><span class="question-num">43.</span> Je remarque rapidement quand une tension physique s'installe dans mon corps.</div><div class="radio-group"><div class="radio-option"><input type="radio" name="q42" id="q42_0" value="0" onchange="onAnswer(42,0)"><label for="q42_0">Pas du tout vrai</label></div><div class="radio-option"><input type="radio" name="q42" id="q42_1" value="1" onchange="onAnswer(42,1)"><label for="q42_1">Plutôt faux</label></div><div class="radio-option"><input type="radio" name="q42" id="q42_2" value="2" onchange="onAnswer(42,2)"><label for="q42_2">Plutôt vrai</label></div><div class="radio-option"><input type="radio" name="q42" id="q42_3" value="3" onchange="onAnswer(42,3)"><label for="q42_3">Tout à fait vrai</label></div></div></div>
+<div class="question-block" id="qblock-43"><div class="question-text"><span class="question-num">44.</span> Je continue souvent à travailler ou à réfléchir alors que mon corps me demande de m'arrêter.</div><div class="radio-group"><div class="radio-option"><input type="radio" name="q43" id="q43_0" value="0" onchange="onAnswer(43,0)"><label for="q43_0">Pas du tout vrai</label></div><div class="radio-option"><input type="radio" name="q43" id="q43_1" value="1" onchange="onAnswer(43,1)"><label for="q43_1">Plutôt faux</label></div><div class="radio-option"><input type="radio" name="q43" id="q43_2" value="2" onchange="onAnswer(43,2)"><label for="q43_2">Plutôt vrai</label></div><div class="radio-option"><input type="radio" name="q43" id="q43_3" value="3" onchange="onAnswer(43,3)"><label for="q43_3">Tout à fait vrai</label></div></div></div>
+<div class="question-block" id="qblock-44"><div class="question-text"><span class="question-num">45.</span> Mon corps et ma tête fonctionnent en bonne intelligence — l'un informe l'autre naturellement.</div><div class="radio-group"><div class="radio-option"><input type="radio" name="q44" id="q44_0" value="0" onchange="onAnswer(44,0)"><label for="q44_0">Pas du tout vrai</label></div><div class="radio-option"><input type="radio" name="q44" id="q44_1" value="1" onchange="onAnswer(44,1)"><label for="q44_1">Plutôt faux</label></div><div class="radio-option"><input type="radio" name="q44" id="q44_2" value="2" onchange="onAnswer(44,2)"><label for="q44_2">Plutôt vrai</label></div><div class="radio-option"><input type="radio" name="q44" id="q44_3" value="3" onchange="onAnswer(44,3)"><label for="q44_3">Tout à fait vrai</label></div></div></div>
+<div class="question-block" id="qblock-45"><div class="question-text"><span class="question-num">46.</span> Je vis davantage dans ma tête que dans mon corps.</div><div class="radio-group"><div class="radio-option"><input type="radio" name="q45" id="q45_0" value="0" onchange="onAnswer(45,0)"><label for="q45_0">Pas du tout vrai</label></div><div class="radio-option"><input type="radio" name="q45" id="q45_1" value="1" onchange="onAnswer(45,1)"><label for="q45_1">Plutôt faux</label></div><div class="radio-option"><input type="radio" name="q45" id="q45_2" value="2" onchange="onAnswer(45,2)"><label for="q45_2">Plutôt vrai</label></div><div class="radio-option"><input type="radio" name="q45" id="q45_3" value="3" onchange="onAnswer(45,3)"><label for="q45_3">Tout à fait vrai</label></div></div></div>
+<div class="axe-title">Axe 6 — Fonctionnement sous contrainte ou sous pression</div>
+<div class="question-block" id="qblock-46"><div class="question-text"><span class="question-num">47.</span> Sous pression, je tends à m'organiser mieux et à aller à l'essentiel.</div><div class="radio-group"><div class="radio-option"><input type="radio" name="q46" id="q46_0" value="0" onchange="onAnswer(46,0)"><label for="q46_0">Pas du tout vrai</label></div><div class="radio-option"><input type="radio" name="q46" id="q46_1" value="1" onchange="onAnswer(46,1)"><label for="q46_1">Plutôt faux</label></div><div class="radio-option"><input type="radio" name="q46" id="q46_2" value="2" onchange="onAnswer(46,2)"><label for="q46_2">Plutôt vrai</label></div><div class="radio-option"><input type="radio" name="q46" id="q46_3" value="3" onchange="onAnswer(46,3)"><label for="q46_3">Tout à fait vrai</label></div></div></div>
+<div class="question-block" id="qblock-47"><div class="question-text"><span class="question-num">48.</span> Quand je suis surchargé, mon énergie se disperse et j'ai du mal à prioriser.</div><div class="radio-group"><div class="radio-option"><input type="radio" name="q47" id="q47_0" value="0" onchange="onAnswer(47,0)"><label for="q47_0">Pas du tout vrai</label></div><div class="radio-option"><input type="radio" name="q47" id="q47_1" value="1" onchange="onAnswer(47,1)"><label for="q47_1">Plutôt faux</label></div><div class="radio-option"><input type="radio" name="q47" id="q47_2" value="2" onchange="onAnswer(47,2)"><label for="q47_2">Plutôt vrai</label></div><div class="radio-option"><input type="radio" name="q47" id="q47_3" value="3" onchange="onAnswer(47,3)"><label for="q47_3">Tout à fait vrai</label></div></div></div>
+<div class="question-block" id="qblock-48"><div class="question-text"><span class="question-num">49.</span> Face à une situation stressante, je me fige — j'ai du mal à me mettre en mouvement.</div><div class="radio-group"><div class="radio-option"><input type="radio" name="q48" id="q48_0" value="0" onchange="onAnswer(48,0)"><label for="q48_0">Pas du tout vrai</label></div><div class="radio-option"><input type="radio" name="q48" id="q48_1" value="1" onchange="onAnswer(48,1)"><label for="q48_1">Plutôt faux</label></div><div class="radio-option"><input type="radio" name="q48" id="q48_2" value="2" onchange="onAnswer(48,2)"><label for="q48_2">Plutôt vrai</label></div><div class="radio-option"><input type="radio" name="q48" id="q48_3" value="3" onchange="onAnswer(48,3)"><label for="q48_3">Tout à fait vrai</label></div></div></div>
+<div class="question-block" id="qblock-49"><div class="question-text"><span class="question-num">50.</span> La pression peut parfois être un moteur pour moi — elle active quelque chose.</div><div class="radio-group"><div class="radio-option"><input type="radio" name="q49" id="q49_0" value="0" onchange="onAnswer(49,0)"><label for="q49_0">Pas du tout vrai</label></div><div class="radio-option"><input type="radio" name="q49" id="q49_1" value="1" onchange="onAnswer(49,1)"><label for="q49_1">Plutôt faux</label></div><div class="radio-option"><input type="radio" name="q49" id="q49_2" value="2" onchange="onAnswer(49,2)"><label for="q49_2">Plutôt vrai</label></div><div class="radio-option"><input type="radio" name="q49" id="q49_3" value="3" onchange="onAnswer(49,3)"><label for="q49_3">Tout à fait vrai</label></div></div></div>
+<div class="question-block" id="qblock-50"><div class="question-text"><span class="question-num">51.</span> Quand je suis fatigué, je continue à fonctionner en apparence mais je sais que je tourne au ralenti intérieurement.</div><div class="radio-group"><div class="radio-option"><input type="radio" name="q50" id="q50_0" value="0" onchange="onAnswer(50,0)"><label for="q50_0">Pas du tout vrai</label></div><div class="radio-option"><input type="radio" name="q50" id="q50_1" value="1" onchange="onAnswer(50,1)"><label for="q50_1">Plutôt faux</label></div><div class="radio-option"><input type="radio" name="q50" id="q50_2" value="2" onchange="onAnswer(50,2)"><label for="q50_2">Plutôt vrai</label></div><div class="radio-option"><input type="radio" name="q50" id="q50_3" value="3" onchange="onAnswer(50,3)"><label for="q50_3">Tout à fait vrai</label></div></div></div>
+<div class="question-block" id="qblock-51"><div class="question-text"><span class="question-num">52.</span> Sous contrainte, je me replie — j'ai besoin de me retirer pour retrouver mes ressources.</div><div class="radio-group"><div class="radio-option"><input type="radio" name="q51" id="q51_0" value="0" onchange="onAnswer(51,0)"><label for="q51_0">Pas du tout vrai</label></div><div class="radio-option"><input type="radio" name="q51" id="q51_1" value="1" onchange="onAnswer(51,1)"><label for="q51_1">Plutôt faux</label></div><div class="radio-option"><input type="radio" name="q51" id="q51_2" value="2" onchange="onAnswer(51,2)"><label for="q51_2">Plutôt vrai</label></div><div class="radio-option"><input type="radio" name="q51" id="q51_3" value="3" onchange="onAnswer(51,3)"><label for="q51_3">Tout à fait vrai</label></div></div></div>
+<div class="question-block" id="qblock-52"><div class="question-text"><span class="question-num">53.</span> En période de surcharge, je deviens irritable sans toujours comprendre pourquoi.</div><div class="radio-group"><div class="radio-option"><input type="radio" name="q52" id="q52_0" value="0" onchange="onAnswer(52,0)"><label for="q52_0">Pas du tout vrai</label></div><div class="radio-option"><input type="radio" name="q52" id="q52_1" value="1" onchange="onAnswer(52,1)"><label for="q52_1">Plutôt faux</label></div><div class="radio-option"><input type="radio" name="q52" id="q52_2" value="2" onchange="onAnswer(52,2)"><label for="q52_2">Plutôt vrai</label></div><div class="radio-option"><input type="radio" name="q52" id="q52_3" value="3" onchange="onAnswer(52,3)"><label for="q52_3">Tout à fait vrai</label></div></div></div>
+<div class="question-block" id="qblock-53"><div class="question-text"><span class="question-num">54.</span> Quand la pression monte, j'ai tendance à compenser par un surcroît d'activité.</div><div class="radio-group"><div class="radio-option"><input type="radio" name="q53" id="q53_0" value="0" onchange="onAnswer(53,0)"><label for="q53_0">Pas du tout vrai</label></div><div class="radio-option"><input type="radio" name="q53" id="q53_1" value="1" onchange="onAnswer(53,1)"><label for="q53_1">Plutôt faux</label></div><div class="radio-option"><input type="radio" name="q53" id="q53_2" value="2" onchange="onAnswer(53,2)"><label for="q53_2">Plutôt vrai</label></div><div class="radio-option"><input type="radio" name="q53" id="q53_3" value="3" onchange="onAnswer(53,3)"><label for="q53_3">Tout à fait vrai</label></div></div></div>
+<div class="question-block" id="qblock-54"><div class="question-text"><span class="question-num">55.</span> Je mets du temps à réaliser que je suis en surcharge — je le comprends souvent après coup.</div><div class="radio-group"><div class="radio-option"><input type="radio" name="q54" id="q54_0" value="0" onchange="onAnswer(54,0)"><label for="q54_0">Pas du tout vrai</label></div><div class="radio-option"><input type="radio" name="q54" id="q54_1" value="1" onchange="onAnswer(54,1)"><label for="q54_1">Plutôt faux</label></div><div class="radio-option"><input type="radio" name="q54" id="q54_2" value="2" onchange="onAnswer(54,2)"><label for="q54_2">Plutôt vrai</label></div><div class="radio-option"><input type="radio" name="q54" id="q54_3" value="3" onchange="onAnswer(54,3)"><label for="q54_3">Tout à fait vrai</label></div></div></div>
+<div class="question-block" id="qblock-55"><div class="question-text"><span class="question-num">56.</span> Sous pression, je perds accès à ce qui me ressemble vraiment — mes décisions et mes réactions ne me sont plus caractéristiques.</div><div class="radio-group"><div class="radio-option"><input type="radio" name="q55" id="q55_0" value="0" onchange="onAnswer(55,0)"><label for="q55_0">Pas du tout vrai</label></div><div class="radio-option"><input type="radio" name="q55" id="q55_1" value="1" onchange="onAnswer(55,1)"><label for="q55_1">Plutôt faux</label></div><div class="radio-option"><input type="radio" name="q55" id="q55_2" value="2" onchange="onAnswer(55,2)"><label for="q55_2">Plutôt vrai</label></div><div class="radio-option"><input type="radio" name="q55" id="q55_3" value="3" onchange="onAnswer(55,3)"><label for="q55_3">Tout à fait vrai</label></div></div></div>
+  </div>
+
+  <div class="cloture">
+    Merci d'avoir complete ce questionnaire. Vos reponses permettront a votre praticien d'etablir votre profil energetique dans le cadre de votre accompagnement.
+  </div>
+
+  <div class="submit-section">
+    <div class="patient-info">
+      <label for="patientName">Votre nom et prenom</label>
+      <input type="text" id="patientName" placeholder="ex : Marie Dupont">
+    </div>
+    <div class="patient-info">
+      <label for="patientDate">Date de completion</label>
+      <input type="date" id="patientDate">
+    </div>
+    <div class="patient-info">
+      <label for="praticienEmail">Email de votre praticien</label>
+      <input type="email" id="praticienEmail" placeholder="ex : praticien@cabinet.fr">
+      <div class="field-hint">Laissez vide si vous ne connaissez pas l'adresse.</div>
+    </div>
+    <button type="button" class="btn-submit" onclick="valider()">Valider et envoyer mes resultats</button>
+    <div id="warningMsg"></div>
+  </div>
+
+  <div class="restitution" id="restitution">
+    <div class="rest-title">Questionnaire complete</div>
+    <div id="confirmMsg" style="font-size:14px;color:#27500A;line-height:1.8;margin:12px 0 14px;"></div>
+    <div id="sendInfo" style="font-size:13.5px;color:#444;margin-bottom:14px;"></div>
+    <button type="button" class="btn-copy" onclick="copyResults()" id="btnCopy">Copier les resultats</button>
+    <div id="copyConfirm" style="display:none;margin-top:10px;padding:10px 14px;background:#EAF3DE;border-radius:8px;font-size:13px;color:#27500A;">
+      Resultats copies - collez-les dans un email a votre praticien.
+    </div>
+    <p style="font-size:12px;color:#888;margin-top:14px;font-style:italic;">
+      Copiez les resultats puis collez-les dans un email a votre praticien.
+    </p>
+    <textarea id="emailBody" style="position:absolute;left:-9999px;top:-9999px;opacity:0;" readonly></textarea>
+  </div>
+
+</div>
+<script>
+var INV_GLOBAL = [1, 3, 5, 6, 8, 10, 12, 14, 16, 19, 21, 23, 25, 27, 28, 35, 37, 39, 41, 43, 45, 47, 48, 50, 51, 52, 53, 54, 55];
+var AXES_DATA = [
+  { name: "Axe 1 — Niveau global d'énergie et endurance", start: 0, count: 8 },
+  { name: "Axe 2 — Orientation de l'énergie : dedans ou dehors", start: 8, count: 10 },
+  { name: "Axe 3 — Qualité de l'énergie : ciblée ou dispersée", start: 18, count: 10 },
+  { name: "Axe 4 — Écart entre l'énergie visible et l'activité intérieure réelle", start: 28, count: 8 },
+  { name: "Axe 5 — Rapport au corps : allié ou oublié", start: 36, count: 10 },
+  { name: "Axe 6 — Fonctionnement sous contrainte ou sous pression", start: 46, count: 10 },
+];
+var TOTAL = 56;
+var OPTIONS = ["Pas du tout vrai", "Plutot faux", "Plutot vrai", "Tout a fait vrai"];
+var answers = new Array(TOTAL).fill(null);
+var answered = 0;
+document.getElementById("patientDate").valueAsDate = new Date();
+
+function onAnswer(i, val) {
+  if (answers[i] === null) answered++;
+  answers[i] = val;
+  document.getElementById("qblock-" + i).classList.add("answered");
+  var pct = Math.round((answered / TOTAL) * 100);
+  document.getElementById("progressBar").style.width = pct + "%";
+  document.getElementById("progressLabel").textContent = answered + " / " + TOTAL + " question(s) repondue(s)";
+}
+
+function scoredVal(i) {
+  var raw = answers[i];
+  if (raw === null) return null;
+  var v = raw + 1;
+  return INV_GLOBAL.includes(i) ? (5 - v) : v;
+}
+
+function valider() {
+  var unanswered = [];
+  for (var i = 0; i < TOTAL; i++) { if (answers[i] === null) unanswered.push(i+1); }
+  if (unanswered.length > 0) {
+    var list = unanswered.slice(0, 10).join(", ") + (unanswered.length > 10 ? "..." : "");
+    document.getElementById("warningMsg").innerHTML = "<div class=\"warning-msg\">" + unanswered.length + " question(s) sans reponse : " + list + ". Merci de repondre a toutes les questions avant de valider.</div>";
+    document.getElementById("warningMsg").scrollIntoView({behavior: "smooth", block: "center"});
+    return;
+  }
+  document.getElementById("warningMsg").innerHTML = "";
+
+  var name  = document.getElementById("patientName").value.trim() || "non renseigne";
+  var date  = document.getElementById("patientDate").value || "";
+  var email = document.getElementById("praticienEmail").value.trim();
+
+  var body = "PROFIL ENERGETIQUE\n";
+  body += "Participant(e) : " + name + "\n";
+  body += "Date : " + date + "\n\n";
+  body += "REPONSES (1=Pas du tout vrai  2=Plutot faux  3=Plutot vrai  4=Tout a fait vrai)\n\n";
+  for (var j = 0; j < TOTAL; j++) {
+    var a = answers[j];
+    var num = (j < 9) ? "0" + (j+1) : "" + (j+1);
+    body += "Q" + num + " : " + (a !== null ? (a+1) : "-") + "\n";
+  }
+
+  document.getElementById("emailBody").value = body;
+
+  document.getElementById("confirmMsg").innerHTML =
+    "Merci " + (name !== "non renseigne" ? "<strong>" + name + "</strong>" : "") + ", vos reponses ont bien ete enregistrees.";
+  document.getElementById("sendInfo").innerHTML = email
+    ? "Cliquez ci-dessous pour copier vos resultats — collez-les dans un email a <strong>" + email + "</strong>."
+    : "Cliquez ci-dessous pour copier vos resultats — collez-les dans un email a votre praticien.";
+
+  var rest = document.getElementById("restitution");
+  rest.classList.add("visible");
+  rest.scrollIntoView({behavior: "smooth", block: "start"});
+}
+
+function copyResults() {
+  var text = document.getElementById("emailBody").value;
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(function() {
+      document.getElementById("copyConfirm").style.display = "block";
+      document.getElementById("btnCopy").textContent = "Copie !";
+    }).catch(function() { fallbackCopy(text); });
+  } else { fallbackCopy(text); }
+}
+
+function fallbackCopy(text) {
+  var el = document.getElementById("emailBody");
+  el.style.position = "static";
+  el.style.opacity = "1";
+  el.select();
+  try {
+    document.execCommand("copy");
+    document.getElementById("copyConfirm").style.display = "block";
+    document.getElementById("btnCopy").textContent = "Copie !";
+  } catch(e) { el.focus(); el.select(); }
+}
+
+</script>
+</body>
+</html>
