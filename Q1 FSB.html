@@ -1867,11 +1867,11 @@ function fallbackCopy(text) {
     </div>
     <div class="patient-info">
       <label for="praticienEmail">Email de votre praticien</label>
-      <input type="email" id="praticienEmail" placeholder="ex : praticien@cabinet.fr">
-      <div class="field-hint">Laissez vide si vous ne connaissez pas l'adresse — vous pourrez la saisir dans votre messagerie.</div>
+      <input type="email" id="praticienEmail" value="lefebvremarine75@gmail.com" placeholder="ex : praticien@cabinet.fr">
+      <div class="field-hint">Adresse pré-remplie. Modifiez-la uniquement si vous voyez votre praticien dans un autre cabinet.</div>
     </div>
     <button type="button" class="btn-submit" onclick="valider()">
-      ✉ Valider et envoyer mes résultats
+      Valider mes réponses
     </button>
     <div id="warningMsg"></div>
   </div>
@@ -1879,19 +1879,24 @@ function fallbackCopy(text) {
   <!-- CONFIRMATION — visible after validation -->
   <div class="restitution" id="restitution">
     <div class="rest-title">✓ Questionnaire complété</div>
-    <div id="confirmMsg" style="font-size:14px;color:#27500A;line-height:1.8;margin:12px 0 20px;"></div>
-    <div id="sendInfo" style="font-size:13.5px;color:#444;margin-bottom:14px;"></div>
+    <div id="confirmMsg" style="font-size:14px;color:#27500A;line-height:1.8;margin:12px 0 14px;"></div>
+    <div style="background:#FFF8E1;border:2px solid #F5A623;border-radius:10px;padding:14px 16px;margin:14px 0;color:#5C3A00;line-height:1.6;">
+      <div style="font-weight:700;font-size:14px;margin-bottom:8px;">⚠ Vos résultats ne sont pas encore envoyés</div>
+      <div style="font-size:13.5px;">Pour les transmettre à votre praticien, suivez ces 3 étapes :</div>
+      <ol style="margin:8px 0 0 22px;padding:0;font-size:13.5px;">
+        <li>Cliquez sur le bouton <strong>« Copier les résultats »</strong> ci-dessous</li>
+        <li>Ouvrez votre messagerie (Mail, Gmail, Outlook…) et créez un nouvel email <span id="sendInfo"></span></li>
+        <li>Collez les résultats dans le corps du message et envoyez</li>
+      </ol>
+    </div>
     <button type="button" class="rest-send-link" onclick="copyResults()" id="btnCopy">
       ⎘ Copier les résultats
     </button>
     <div id="copyConfirm" style="display:none;margin-top:10px;padding:10px 14px;background:#EAF3DE;border-radius:8px;font-size:13px;color:#27500A;">
-      ✓ Résultats copiés — collez-les dans un email à votre praticien.
+      ✓ Résultats copiés — il reste à les coller dans un email à votre praticien.
     </div>
-    <p style="font-size:12px;color:#888;margin-top:14px;font-style:italic;">
-      Copiez les résultats puis collez-les dans un email à votre praticien. Ils seront analysés lors de votre prochain rendez-vous.
-    </p>
-    <p style="font-size:11.5px;color:#bbb;margin-top:6px;">
-      Ou essayez : <a id="mailtoLink" href="#" style="color:#97C459;font-size:11.5px;">ouvrir directement ma messagerie</a>
+    <p style="font-size:11.5px;color:#888;margin-top:10px;text-align:center;">
+      Astuce : vous pouvez aussi <a id="mailtoLink" href="#" style="color:#97C459;">ouvrir directement votre messagerie pré-remplie</a>
     </p>
     <!-- Hidden textarea holds email body for clipboard copy -->
     <textarea id="emailBody" style="position:absolute;left:-9999px;top:-9999px;opacity:0;" readonly></textarea>
@@ -1983,14 +1988,12 @@ function valider() {
   const mailto  = 'mailto:' + (email || '') + '?subject=' + subject + '&body=' + bodyEnc;
   document.getElementById('mailtoLink').href = mailto;
   document.getElementById('sendInfo').innerHTML = email
-    ? 'Adresse pré-remplie&nbsp;: <strong>' + email + '</strong>'
-    : 'Aucune adresse renseignée — vous pourrez la saisir dans votre messagerie.';
+    ? 'à <strong>' + email + '</strong>'
+    : 'à votre praticien';
 
   // ── Confirmation message ──
   document.getElementById('confirmMsg').innerHTML =
-    'Merci ' + (name !== '(non renseigné)' ? '<strong>' + name + '</strong>' : '') + ', vos réponses ont bien été enregistrées.' +
-    (email ? '<br>Cliquez sur le bouton ci-dessous pour les envoyer à <strong>' + email + '</strong>.' :
-             '<br>Cliquez sur le bouton ci-dessous pour ouvrir votre messagerie — vous pourrez y saisir l\'adresse de votre praticien.');
+    'Merci ' + (name !== '(non renseigné)' ? '<strong>' + name + '</strong>' : '') + ', vos réponses ont bien été enregistrées.';
 
   // ── Show confirmation ──
   const rest = document.getElementById('restitution');

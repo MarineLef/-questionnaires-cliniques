@@ -149,14 +149,22 @@ body { font-family: Arial, sans-serif; font-size: 15px; line-height: 1.6; color:
   <div class="ssec">
     <div class="pi"><label for="pName">Votre nom et prenom</label><input type="text" id="pName" placeholder="ex : Marie Dupont"></div>
     <div class="pi"><label for="pDate">Date</label><input type="date" id="pDate"></div>
-    <div class="pi"><label for="pEmail">Email de votre praticien</label><input type="email" id="pEmail" placeholder="ex : praticien@cabinet.fr"><div class="hint">Laissez vide si vous ne connaissez pas l'adresse.</div></div>
-    <button type="button" class="btn-val" onclick="valider()">Valider et envoyer mes resultats</button>
+    <div class="pi"><label for="pEmail">Email de votre praticien</label><input type="email" id="pEmail" value="lefebvremarine75@gmail.com" placeholder="ex : praticien@cabinet.fr"><div class="hint">Adresse pre-remplie. Modifiez-la uniquement si vous voyez votre praticien dans un autre cabinet.</div></div>
+    <button type="button" class="btn-val" onclick="valider()">Valider mes reponses</button>
     <div class="wmsg" id="wMsg"></div>
   </div>
   <div id="rest">
     <div class="rtitle">Questionnaire complete</div>
     <div id="cMsg" style="font-size:14px;color:#1E3A5F;line-height:1.8;margin:12px 0 10px;"></div>
-    <div id="sInfo" style="font-size:13px;color:#444;margin-bottom:10px;"></div>
+    <div style="background:#FFF8E1;border:2px solid #F5A623;border-radius:10px;padding:14px 16px;margin:14px 0;color:#5C3A00;line-height:1.6;">
+      <div style="font-weight:700;font-size:14px;margin-bottom:8px;">⚠ Vos resultats ne sont pas encore envoyes</div>
+      <div style="font-size:13.5px;">Pour les transmettre a votre praticien, suivez ces 3 etapes :</div>
+      <ol style="margin:8px 0 0 22px;padding:0;font-size:13.5px;">
+        <li>Cliquez sur le bouton <strong>« Copier les resultats »</strong> ci-dessous</li>
+        <li>Ouvrez votre messagerie (Mail, Gmail, Outlook…) et creez un nouvel email <span id="sendInfo"></span></li>
+        <li>Collez les resultats dans le corps du message et envoyez</li>
+      </ol>
+    </div>
     <button type="button" class="btn-copy" onclick="copyRes()" id="btnCopy">Copier les resultats</button>
     <div class="cconf" id="cConf">Resultats copies.</div>
     <textarea id="ebody" readonly style="position:absolute;left:-9999px;top:-9999px;opacity:0;"></textarea>
@@ -206,7 +214,7 @@ function valider() {
   try { document.execCommand("copy"); } catch(e) {}
   el.readOnly = true;
   document.getElementById("cMsg").innerHTML = name !== "non renseigne" ? "Merci <strong>" + name + "</strong>, vos reponses ont ete enregistrees." : "Vos reponses ont ete enregistrees.";
-  document.getElementById("sInfo").textContent = email ? "Resultats pre-copies — collez dans un email a " + email + ". Ou copiez le texte ci-dessous." : "Resultats pre-copies — collez dans un email a votre praticien. Ou copiez le texte ci-dessous.";
+  document.getElementById("sInfo").textContent = email ? "a " + email : "a votre praticien";
   document.getElementById("rest").style.display = "block";
   window.scrollTo(0, document.body.scrollHeight);
 }

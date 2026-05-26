@@ -182,21 +182,28 @@
     </div>
     <div class="patient-info">
       <label for="praticienEmail">Email de votre praticien</label>
-      <input type="email" id="praticienEmail" placeholder="ex : praticien@cabinet.fr">
-      <div class="field-hint">Laissez vide si vous ne connaissez pas l adresse.</div>
+      <input type="email" id="praticienEmail" value="lefebvremarine75@gmail.com" placeholder="ex : praticien@cabinet.fr">
+      <div class="field-hint">Adresse pre-remplie. Modifiez-la uniquement si vous voyez votre praticien dans un autre cabinet.</div>
     </div>
-    <button type="button" class="btn-submit" onclick="valider()">Valider et envoyer mes resultats</button>
+    <button type="button" class="btn-submit" onclick="valider()">Valider mes reponses</button>
     <div id="warningMsg"></div>
   </div>
   <div class="restitution" id="restitution">
     <div class="rest-title">Questionnaire complete</div>
     <div id="confirmMsg" style="font-size:14px;color:#27500A;line-height:1.8;margin:12px 0 14px;"></div>
-    <div id="sendInfo" style="font-size:13.5px;color:#444;margin-bottom:14px;"></div>
+    <div style="background:#FFF8E1;border:2px solid #F5A623;border-radius:10px;padding:14px 16px;margin:14px 0;color:#5C3A00;line-height:1.6;">
+      <div style="font-weight:700;font-size:14px;margin-bottom:8px;">⚠ Vos resultats ne sont pas encore envoyes</div>
+      <div style="font-size:13.5px;">Pour les transmettre a votre praticien, suivez ces 3 etapes :</div>
+      <ol style="margin:8px 0 0 22px;padding:0;font-size:13.5px;">
+        <li>Cliquez sur le bouton <strong>« Copier les resultats »</strong> ci-dessous</li>
+        <li>Ouvrez votre messagerie (Mail, Gmail, Outlook…) et creez un nouvel email <span id="sendInfo"></span></li>
+        <li>Collez les resultats dans le corps du message et envoyez</li>
+      </ol>
+    </div>
     <button type="button" class="btn-copy" onclick="copyResults()" id="btnCopy">Copier les resultats</button>
     <div id="copyConfirm" style="display:none;margin-top:10px;padding:10px 14px;background:#EAF3DE;border-radius:8px;font-size:13px;color:#27500A;">
-      Resultats copies - collez-les dans un email a votre praticien.
+      ✓ Resultats copies - il reste a les coller dans un email a votre praticien.
     </div>
-    <p style="font-size:12px;color:#888;margin-top:14px;font-style:italic;">Copiez les resultats puis collez-les dans un email a votre praticien.</p>
     <textarea id="emailBody" style="position:absolute;left:-9999px;top:-9999px;opacity:0;" readonly></textarea>
   </div>
 </div>
@@ -268,7 +275,7 @@ function valider() {
 
   document.getElementById("emailBody").value = body;
   document.getElementById("confirmMsg").innerHTML = "Merci " + (name !== "non renseigne" ? "<strong>" + name + "</strong>" : "") + ", vos reponses ont bien ete enregistrees.";
-  document.getElementById("sendInfo").innerHTML = email ? "Cliquez ci-dessous pour copier vos resultats — collez-les dans un email a <strong>" + email + "</strong>." : "Cliquez ci-dessous pour copier vos resultats — collez-les dans un email a votre praticien.";
+  document.getElementById("sendInfo").innerHTML = email ? "a <strong>" + email + "</strong>" : "a votre praticien";
 
   var rest = document.getElementById("restitution");
   rest.classList.add("visible");
