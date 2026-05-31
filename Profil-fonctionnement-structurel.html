@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Profil structurel de fonctionnement</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Arial, Helvetica, sans-serif; font-size: 15px; line-height: 1.6; color: #1a1a1a; background: #f5f3f0; padding: 20px; }
+  .container { max-width: 840px; margin: 0 auto; background: #fff; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,.08); overflow: hidden; }
+  .header { background: #3B6D11; color: #fff; padding: 32px 40px 26px; }
+  .header h1 { font-size: 22px; font-weight: 600; margin-bottom: 4px; }
+  .header .subtitle { font-size: 13.5px; opacity: .85; margin-top: 6px; font-style: italic; }
+  .header .author { font-size: 13px; opacity: .8; margin-top: 10px; }
+  .intro-box { background: #EAF3DE; border-left: 4px solid #639922; margin: 24px 40px 0; padding: 16px 20px; border-radius: 6px; font-size: 13.5px; color: #173404; line-height: 1.7; }
+  .intro-box strong.t { display: block; font-size: 13px; font-weight: 700; color: #3B6D11; margin-bottom: 6px; text-transform: uppercase; letter-spacing: .04em; }
+  .intro-box ul { margin: 8px 0 0 18px; }
+  .intro-box li { margin-bottom: 5px; }
+  .intro-box em { font-style: normal; font-weight: 700; color: #3B6D11; }
+  .completion-bar-wrap { background: #EAF3DE; border-radius: 20px; height: 8px; margin: 20px 40px 0; overflow: hidden; }
+  .completion-bar { height: 100%; background: #639922; border-radius: 20px; transition: width .3s; width: 0%; }
+  .completion-label { font-size: 12px; color: #888; text-align: right; padding: 4px 40px 0; margin-bottom: 16px; }
+  .section { padding: 0 40px 20px; }
+  .question-block { margin-bottom: 14px; padding: 14px 16px; background: #fafaf8; border: 1px solid #e8e8e4; border-radius: 8px; border-left: 3px solid #e8e8e4; transition: border-left-color .2s; }
+  .question-block.answered { border-left-color: #639922; }
+  .question-text { font-size: 14px; color: #1a1a1a; margin-bottom: 11px; line-height: 1.5; }
+  .question-num { font-weight: 700; color: #3B6D11; }
+  .radio-group { display: flex; gap: 8px; flex-wrap: wrap; }
+  .radio-option { flex: 1; min-width: 100px; }
+  .radio-option input[type="radio"] { display: none; }
+  .radio-option label { display: flex; align-items: center; justify-content: center; width: 100%; padding: 8px 6px; border: 1.5px solid #C0DD97; border-radius: 8px; cursor: pointer; font-size: 12.5px; font-weight: 500; color: #3B6D11; background: #fff; transition: all .15s; user-select: none; text-align: center; line-height: 1.3; }
+  .radio-option input[type="radio"]:checked + label { background: #3B6D11; border-color: #3B6D11; color: #fff; }
+  .radio-option label:hover { border-color: #639922; background: #EAF3DE; }
+  .diff-toggle { margin-top: 10px; font-size: 12px; color: #97783a; cursor: pointer; user-select: none; display: inline-flex; align-items: center; gap: 5px; }
+  .diff-toggle:hover { color: #7a5f28; text-decoration: underline; }
+  .diff-wrap { display: none; margin-top: 8px; }
+  .diff-wrap.open { display: block; }
+  .diff-wrap textarea { width: 100%; min-height: 46px; padding: 8px 10px; border: 1.5px solid #E2CFA0; border-radius: 6px; font-family: Arial, sans-serif; font-size: 13px; color: #1a1a1a; background: #FCF8EE; resize: vertical; line-height: 1.5; }
+  .diff-wrap textarea:focus { outline: none; border-color: #C4A96A; }
+  .question-block.flagged { border-left-color: #C4A96A; background: #FCF9F0; }
+  .cloture { background: #EAF3DE; border-left: 4px solid #639922; margin: 6px 40px 26px; padding: 14px 18px; border-radius: 6px; font-size: 13.5px; color: #27500A; font-style: italic; line-height: 1.6; }
+  .submit-section { padding: 28px 40px 40px; background: #fafaf8; border-top: 2px solid #EAF3DE; }
+  .patient-info { margin-bottom: 16px; }
+  .patient-info label { display: block; font-size: 13px; font-weight: 600; color: #444; margin-bottom: 5px; }
+  .patient-info input { width: 100%; padding: 9px 12px; border: 1.5px solid #C0DD97; border-radius: 6px; font-size: 14px; font-family: Arial, sans-serif; color: #1a1a1a; background: #fff; }
+  .patient-info input:focus { outline: none; border-color: #639922; }
+  .field-hint { font-size: 11.5px; color: #888; margin-top: 4px; font-style: italic; }
+  .btn-submit { display: inline-block; padding: 13px 32px; background: #3B6D11; color: #fff; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; font-family: Arial, sans-serif; transition: background .15s; }
+  .btn-submit:hover { background: #639922; }
+  .warning-msg { background: #FFF8E1; border: 1.5px solid #F9A825; border-radius: 8px; padding: 12px 16px; color: #5D4037; font-size: 13.5px; margin-top: 12px; }
+  .success-msg { display: none; background: #EAF3DE; border: 1.5px solid #639922; border-radius: 8px; padding: 18px 22px; color: #173404; font-size: 14px; margin-top: 16px; line-height: 1.6; }
+  .success-msg.visible { display: block; }
+  .success-msg h3 { font-size: 15px; margin-bottom: 8px; color: #27500A; }
+  .success-msg .btn-mailto { display: inline-block; margin-top: 10px; padding: 11px 22px; background: #3B6D11; color: #fff; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px; }
+  .success-msg .btn-mailto:hover { background: #639922; }
+  @media (max-width: 600px) {
+    .header, .section, .submit-section { padding-left: 20px; padding-right: 20px; }
+    .intro-box, .cloture, .completion-bar-wrap, .completion-label { margin-left: 20px; margin-right: 20px; }
+    .radio-option { min-width: 80px; }
+    .radio-option label { font-size: 11.5px; padding: 7px 4px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>Profil structurel de fonctionnement</h1>
+    <div class="subtitle">Les conditions dont votre fonctionnement a besoin pour rester stable, fluide et soutenable</div>
+    <div class="author">Marine Lefebvre — Psychologue</div>
+  </div>
+
+  <div class="intro-box">
+    <strong class="t">À lire avant de répondre</strong>
+    Ce questionnaire explore votre fonctionnement <em>habituel</em> et les conditions dont vous avez besoin pour vous sentir stable — pas votre état d'un jour particulier. Il ne s'agit pas d'évaluer vos compétences, votre valeur ou votre personnalité.
+    <ul>
+      <li>Répondez selon votre fonctionnement spontané et durable, non selon ce que vous pensez devoir être</li>
+      <li>Choisissez la réponse qui vous correspond le mieux, même si aucune n'est parfaite — il n'y a pas de réponse neutre, et c'est volontaire : essayez de pencher d'un côté</li>
+      <li>Si un énoncé vous a vraiment posé problème à trancher, cliquez sur <em>« difficile à choisir »</em> sous l'énoncé et dites en un mot pourquoi. Cette hésitation est une information précieuse.</li>
+    </ul>
+  </div>
+
+  <div class="completion-bar-wrap"><div class="completion-bar" id="progressBar"></div></div>
+  <div class="completion-label" id="progressLabel">0 / 72 question(s) répondue(s)</div>
+
+  <div class="section" id="questionsContainer"></div>
+
+  <div class="cloture">
+    Merci d'avoir complété ce questionnaire. Vos réponses seront lues dans une vision d'ensemble, en tenant compte de votre fonctionnement habituel, et non de situations ponctuelles.
+  </div>
+
+  <div class="submit-section">
+    <div class="patient-info">
+      <label for="patientName">Votre nom et prénom</label>
+      <input type="text" id="patientName" placeholder="ex : Marie Dupont">
+    </div>
+    <div class="patient-info">
+      <label for="patientDate">Date de complétion</label>
+      <input type="date" id="patientDate">
+    </div>
+    <button type="button" class="btn-submit" onclick="valider()">✉ Valider et envoyer mes résultats</button>
+    <div id="warningMsg"></div>
+    <div class="success-msg" id="successMsg">
+      <h3>✓ Questionnaire complété</h3>
+      <p>Vos réponses sont prêtes. Cliquez ci-dessous pour ouvrir votre messagerie et les envoyer à votre praticienne.</p>
+      <a id="mailtoLink" class="btn-mailto" href="#">✉ Ouvrir ma messagerie</a>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ── MÉTADONNÉES : 6 familles, 18 sous-dimensions ──────────────────────────────
+var FAMILIES = [
+  "Sens & engagement",
+  "Sensibilité & perception",
+  "Besoin de lisibilité",
+  "Régulation sociale",
+  "Cadres, autonomie & rythme",
+  "Régulation interne & émotionnelle"
+];
+// sub: [nom, indice de famille]
+var SUBDIMS = [
+  ["Sens & engagement", 0],
+  ["Cohérence & authenticité", 0],
+  ["Environnement physique", 1],
+  ["Environnement humain", 1],
+  ["Clarté", 2],
+  ["Style cognitif (S ↔ N)", 2],
+  ["Interactions sociales", 3],
+  ["Reconnaissance", 3],
+  ["Sécurité & fiabilité relationnelle", 3],
+  ["Autonomie & maîtrise", 4],
+  ["Rythme", 4],
+  ["Temporalité", 4],
+  ["Sécurité intérieure", 5],
+  ["Réactivité & intensité émotionnelle", 5],
+  ["Régulation & clarté émotionnelle", 5],
+  ["Mode d'expression émotionnelle (intériorisée ↔ extériorisée)", 5],
+  ["Corps", 5],
+  ["Charge cognitive", 5]
+];
+
+// ── ITEMS : 72 items, 4 par sous-dimension (2 directs + 2 inversés)
+var ITEMS = [
+  // 0 Sens & engagement
+  { t: "Je perds de l'élan dans une activité quand je n'en perçois plus le sens ou l'intérêt.", sub: 0, inv: false },
+  { t: "Mon investissement et la qualité de ce que je produis dépendent nettement du sens et de l'intérêt que je porte à ce que je fais.", sub: 0, inv: false },
+  { t: "Je tiens dans la durée même sur des activités qui n'ont pour moi ni sens ni intérêt.", sub: 0, inv: true },
+  { t: "Le sens ou l'intérêt de ce que je fais influence peu mon énergie et mon implication.", sub: 0, inv: true },
+  // 1 Cohérence & authenticité (fusion ex-Cohérence + ex-Expression de soi)
+  { t: "Il m'est difficile de m'investir durablement dans quelque chose dont je ne partage pas les valeurs.", sub: 1, inv: false },
+  { t: "Quand je dois longtemps maintenir une façon d'être éloignée de ce que je suis, quelque chose finit par se contracter en moi.", sub: 1, inv: false },
+  { t: "Agir en décalage avec mes valeurs ou avec ce que je suis ne pèse pas vraiment sur mon énergie.", sub: 1, inv: true },
+  { t: "Adapter ce que je montre de moi selon les contextes ne me demande pas d'effort particulier.", sub: 1, inv: true },
+  // 2 Environnement physique
+  { t: "Un espace visuellement chargé, désordonné ou bruyant fait assez vite monter en moi une tension.", sub: 2, inv: false },
+  { t: "Un environnement physique qui ne me convient pas finit par peser sur ma concentration ou mon humeur.", sub: 2, inv: false },
+  { t: "Un lieu bruyant ou encombré ne me gêne pas particulièrement.", sub: 2, inv: true },
+  { t: "L'état de mon environnement physique — bruit, désordre, lumière — influence peu mon humeur ou ma concentration.", sub: 2, inv: true },
+  // 3 Environnement humain
+  { t: "Je perçois assez vite qu'une dynamique de groupe est tendue ou inauthentique, même sans que rien ne soit dit.", sub: 3, inv: false },
+  { t: "Après une période dans un environnement humain qui ne me convient pas, je ressens une usure difficile à nommer.", sub: 3, inv: false },
+  { t: "La qualité humaine d'un environnement ne change pas vraiment ma façon de fonctionner au quotidien.", sub: 3, inv: true },
+  { t: "Les tensions implicites autour de moi ne mobilisent pas particulièrement mon attention.", sub: 3, inv: true },
+  // 4 Clarté
+  { t: "Quand ce qui est attendu de moi n'est pas clair, je remarque une hésitation ou une dispersion dans mon fonctionnement.", sub: 4, inv: false },
+  { t: "L'ambiguïté qui dure finit par générer en moi une tension que je n'ai pas dans un cadre lisible.", sub: 4, inv: false },
+  { t: "Avancer dans des situations peu définies ne me coûte pas particulièrement.", sub: 4, inv: true },
+  { t: "Le manque de clarté sur ce qui est attendu ne perturbe pas vraiment mon fonctionnement.", sub: 4, inv: true },
+  // 5 Style cognitif (S ↔ N) — score élevé = N (intuitif/global), bas = S (concret/séquentiel)
+  { t: "Je saisis le sens global et les liens d'ensemble d'une situation avant d'en voir les détails concrets.", sub: 5, inv: false },
+  { t: "Je suis plus à l'aise avec les idées, les concepts et les possibilités qu'avec les faits concrets et les procédures.", sub: 5, inv: false },
+  { t: "Je m'appuie d'abord sur des éléments concrets et tangibles plutôt que sur des intuitions ou des impressions d'ensemble.", sub: 5, inv: true },
+  { t: "Je préfère avancer pas à pas, sur du connu et du concret, plutôt que d'explorer des pistes abstraites.", sub: 5, inv: true },
+  // 6 Interactions sociales
+  { t: "Le volume de contacts humains dans ma journée a un effet net sur mon énergie en fin de journée.", sub: 6, inv: false },
+  { t: "Il existe pour moi un seuil d'interactions au-delà duquel je commence à me sentir moins bien.", sub: 6, inv: false },
+  { t: "Le nombre d'interactions dans une journée ne change pas vraiment mon état ou mon énergie.", sub: 6, inv: true },
+  { t: "Qu'une journée soit très solitaire ou très sociale ne change pas grand-chose à mon état.", sub: 6, inv: true },
+  // 7 Reconnaissance
+  { t: "Quand ce que j'accomplis concerne ou implique d'autres personnes, ne pas m'y sentir reconnu·e finit par entamer ma motivation.", sub: 7, inv: false },
+  { t: "J'ai besoin de me sentir compris·e et accepté·e pour ce que je suis, pas seulement pour ce que je produis.", sub: 7, inv: false },
+  { t: "Mon énergie et ma motivation tiennent même sans reconnaissance extérieure.", sub: 7, inv: true },
+  { t: "Le regard des autres sur ce que je fais ou ce que je suis influence peu mon équilibre.", sub: 7, inv: true },
+  // 8 Sécurité & fiabilité relationnelle
+  { t: "J'ai besoin de pouvoir compter sur la fiabilité et la constance des personnes pour me sentir en sécurité dans une relation.", sub: 8, inv: false },
+  { t: "Les relations imprévisibles, ou dont les règles changent sans cesse, créent en moi une insécurité qui m'use.", sub: 8, inv: false },
+  { t: "Je me sens à l'aise dans des relations dont je ne sais pas trop à quoi m'attendre.", sub: 8, inv: true },
+  { t: "L'instabilité ou l'imprévisibilité d'une personne n'affecte pas vraiment mon sentiment de sécurité.", sub: 8, inv: true },
+  // 9 Autonomie & maîtrise
+  { t: "Quand je n'ai plus aucune marge pour ajuster mon organisation, une tension monte que je n'ai pas dans un cadre souple.", sub: 9, inv: false },
+  { t: "Je fonctionne mieux quand je peux régler moi-même certains paramètres de mon environnement ou de mon organisation.", sub: 9, inv: false },
+  { t: "Fonctionner dans un cadre entièrement défini par d'autres ne me pèse pas.", sub: 9, inv: true },
+  { t: "Le degré de contrôle que j'ai sur mon organisation ne change pas vraiment mon énergie ou mon bien-être.", sub: 9, inv: true },
+  // 10 Rythme
+  { t: "Quand mon quotidien s'enchaîne sans espaces entre les choses, une saturation s'installe peu à peu.", sub: 10, inv: false },
+  { t: "Les périodes où je peux alterner naturellement effort et repos sont celles où je me sens le plus stable.", sub: 10, inv: false },
+  { t: "Enchaîner des journées intenses sans récupération ne me fait pas grand effet.", sub: 10, inv: true },
+  { t: "Mon rythme de fonctionnement reste stable quelle que soit la densité de ce que je vis.", sub: 10, inv: true },
+  // 11 Temporalité
+  { t: "Quand on me demande de décider très vite, je sens souvent que ma réflexion n'est pas arrivée à son terme.", sub: 11, inv: false },
+  { t: "Ma réflexion a besoin de mûrir : certaines de mes meilleures idées me viennent longtemps après.", sub: 11, inv: false },
+  { t: "Trancher rapidement ne me laisse pas l'impression d'avoir manqué quelque chose d'important.", sub: 11, inv: true },
+  { t: "Travailler dans l'urgence permanente ne change pas vraiment la qualité de ce que je produis.", sub: 11, inv: true },
+  // 12 Sécurité intérieure
+  { t: "Une instabilité intérieure mobilise chez moi une part d'attention qui n'est plus disponible pour autre chose.", sub: 12, inv: false },
+  { t: "Il m'arrive de dépenser de l'énergie à gérer une inquiétude de fond, même dans des situations objectivement calmes.", sub: 12, inv: false },
+  { t: "Même quand je me sens intérieurement fragile, je reste présent·e et capable d'agir.", sub: 12, inv: true },
+  { t: "Mon état intérieur influence peu ma capacité à agir ou à être présent·e.", sub: 12, inv: true },
+  // 13 Réactivité & intensité émotionnelle
+  { t: "Mes émotions sont en général ressenties avec intensité.", sub: 13, inv: false },
+  { t: "Une émotion peut monter en moi rapidement, parfois plus vite que je ne l'aurais voulu.", sub: 13, inv: false },
+  { t: "Mes réactions émotionnelles sont le plus souvent mesurées et d'intensité modérée.", sub: 13, inv: true },
+  { t: "Il en faut beaucoup pour qu'une situation me touche émotionnellement.", sub: 13, inv: true },
+  // 14 Régulation & clarté émotionnelle
+  { t: "Une fois qu'une émotion est là, elle met du temps à redescendre en moi.", sub: 14, inv: false },
+  { t: "Quand une émotion forte me traverse, j'ai du mal à l'identifier clairement sur le moment.", sub: 14, inv: false },
+  { t: "Je parviens en général à apaiser assez vite une émotion forte.", sub: 14, inv: true },
+  { t: "Je sais le plus souvent nommer avec précision ce que je ressens.", sub: 14, inv: true },
+  // 15 Mode d'expression émotionnelle (intériorisée ↔ extériorisée) — élevé = intériorisée, bas = extériorisée
+  { t: "Ce qui me touche en profondeur, j'ai tendance à le garder pour moi plutôt qu'à le montrer.", sub: 15, inv: false },
+  { t: "Ce que je ressens à l'intérieur et ce que je montre à l'extérieur sont souvent assez différents.", sub: 15, inv: false },
+  { t: "Quand une émotion forte me traverse, je l'exprime sur le moment plutôt que de la retenir.", sub: 15, inv: true },
+  { t: "Je traduis facilement en mots ou en actes ce que je ressens, plutôt que de le garder pour moi.", sub: 15, inv: true },
+  // 16 Corps
+  { t: "Je remarque assez vite quand mon corps envoie des signaux — tension, fatigue, inconfort — avant même d'en comprendre la cause.", sub: 16, inv: false },
+  { t: "Mon corps est souvent le premier à me signaler qu'une situation devient trop exigeante pour moi.", sub: 16, inv: false },
+  { t: "Il m'arrive de ne percevoir la fatigue ou la tension que tardivement, une fois qu'elles sont déjà installées.", sub: 16, inv: true },
+  { t: "Je prête peu attention aux signaux que m'envoie mon corps, tant qu'ils ne deviennent pas envahissants.", sub: 16, inv: true },
+  // 17 Charge cognitive
+  { t: "Quand le nombre de choses à gérer en même temps dépasse un certain seuil, ma capacité à penser clairement se dégrade.", sub: 17, inv: false },
+  { t: "L'accumulation d'informations ou de décisions en attente finit par me rendre moins efficace.", sub: 17, inv: false },
+  { t: "Gérer beaucoup de tâches ou de décisions en parallèle n'altère pas ma clarté.", sub: 17, inv: true },
+  { t: "Le volume de ma charge mentale influence peu la qualité de mon fonctionnement.", sub: 17, inv: true }
+];
+
+// Ordre de présentation : mélange contraint (aucune adjacence de même sous-dimension)
+var DISPLAY_ORDER = [69, 3, 19, 9, 12, 56, 7, 58, 28, 46, 1, 14, 54, 60, 50, 18, 4, 55, 0, 48, 11, 35, 43, 17, 27, 57, 21, 24, 30, 52, 47, 20, 65, 38, 26, 13, 36, 66, 31, 49, 71, 67, 33, 23, 59, 61, 2, 29, 32, 6, 8, 63, 45, 39, 68, 44, 10, 15, 37, 64, 41, 34, 70, 40, 25, 51, 42, 53, 5, 16, 22, 62];
+
+var OPTIONS = ["Pas du tout vrai", "Plutôt faux", "Plutôt vrai", "Tout à fait vrai"];
+var TOTAL = ITEMS.length;
+var answers = new Array(TOTAL).fill(null);
+var diffNotes = new Array(TOTAL).fill("");
+
+// Adresse du praticien, pré-remplie comme destinataire par défaut
+var PRACTICIEN_EMAIL = "lefebvremarine75@gmail.com";
+
+// Un item est "traité" s'il a une réponse cochée OU un commentaire de difficulté
+function isComplete(id) {
+  return answers[id] !== null || (diffNotes[id] && diffNotes[id].length > 0);
+}
+function countComplete() {
+  var n = 0;
+  for (var i = 0; i < TOTAL; i++) { if (isComplete(i)) n++; }
+  return n;
+}
+
+// ── CONSTRUCTION DES BLOCS QUESTIONS ──────────────────────────────────────────
+var container = document.getElementById("questionsContainer");
+DISPLAY_ORDER.forEach(function(itemId, pos) {
+  var displayNum = pos + 1;
+  var block = document.createElement("div");
+  block.className = "question-block";
+  block.id = "qblock-" + itemId;
+
+  var radios = "";
+  for (var o = 0; o < OPTIONS.length; o++) {
+    radios += '<div class="radio-option">' +
+      '<input type="radio" name="q' + itemId + '" id="q' + itemId + '_' + o + '" value="' + o + '">' +
+      '<label for="q' + itemId + '_' + o + '">' + OPTIONS[o] + '</label></div>';
+  }
+
+  block.innerHTML =
+    '<div class="question-text"><span class="question-num">' + displayNum + '.</span> ' + ITEMS[itemId].t + '</div>' +
+    '<div class="radio-group">' + radios + '</div>' +
+    '<div class="diff-toggle" data-id="' + itemId + '">＋ difficile à choisir ?</div>' +
+    '<div class="diff-wrap" id="diff-' + itemId + '">' +
+    '<textarea placeholder="En un mot, qu\'est-ce qui rendait ce choix difficile ? (ex. : ça dépend du contexte, ça a changé récemment, je ne me reconnais ni dans l\'un ni dans l\'autre…)"></textarea>' +
+    '</div>';
+  container.appendChild(block);
+
+  // radios
+  block.querySelectorAll('input[type="radio"]').forEach(function(r) {
+    r.addEventListener("change", function() {
+      answers[itemId] = parseInt(this.value);
+      block.classList.add("answered");
+      updateProgress();
+    });
+  });
+  // toggle difficulté
+  var toggle = block.querySelector(".diff-toggle");
+  var wrap = block.querySelector(".diff-wrap");
+  var ta = wrap.querySelector("textarea");
+  toggle.addEventListener("click", function() {
+    wrap.classList.toggle("open");
+    if (wrap.classList.contains("open")) { toggle.innerHTML = "− difficile à choisir"; ta.focus(); }
+    else { toggle.innerHTML = "＋ difficile à choisir ?"; }
+  });
+  ta.addEventListener("input", function() {
+    diffNotes[itemId] = this.value.trim();
+    block.classList.toggle("flagged", diffNotes[itemId].length > 0);
+    updateProgress();
+  });
+});
+
+document.getElementById("patientDate").valueAsDate = new Date();
+if (PRACTICIEN_EMAIL && PRACTICIEN_EMAIL.indexOf("@") > -1) {
+  document.getElementById("praticienEmail").value = PRACTICIEN_EMAIL;
+}
+
+function updateProgress() {
+  var done = countComplete();
+  var pct = Math.round((done / TOTAL) * 100);
+  document.getElementById("progressBar").style.width = pct + "%";
+  document.getElementById("progressLabel").textContent = done + " / " + TOTAL + " question(s) traitée(s)";
+}
+
+// ── VALIDATION + ENVOI ────────────────────────────────────────────────────────
+function valider() {
+  var unanswered = [];
+  // un item non traité = ni réponse cochée, ni commentaire de difficulté
+  for (var pos = 0; pos < DISPLAY_ORDER.length; pos++) {
+    var id = DISPLAY_ORDER[pos];
+    if (!isComplete(id)) unanswered.push(pos + 1);
+  }
+  if (unanswered.length > 0) {
+    var list = unanswered.slice(0, 10).join(", ") + (unanswered.length > 10 ? "…" : "");
+    document.getElementById("warningMsg").innerHTML =
+      '<div class="warning-msg">' + unanswered.length + ' question(s) à traiter : ' + list + '. Pour chacune, choisissez une réponse <em>ou</em>, si vous ne pouvez pas trancher, cliquez sur « difficile à choisir » et indiquez pourquoi.</div>';
+    document.getElementById("warningMsg").scrollIntoView({ behavior: "smooth", block: "center" });
+    return;
+  }
+  document.getElementById("warningMsg").innerHTML = "";
+
+  var name = document.getElementById("patientName").value.trim() || "non renseigné";
+  var date = document.getElementById("patientDate").value || "";
+
+  // ----- corps de l'email : réponses brutes + commentaires uniquement -----
+  var body = "PROFIL STRUCTUREL DE FONCTIONNEMENT\n";
+  body += "Participant(e) : " + name + "\nDate : " + date + "\n";
+  body += "Échelle : 1 = Pas du tout vrai  …  4 = Tout à fait vrai. (inv) = item à inverser au scoring.\n\n";
+
+  body += "=== RÉPONSES BRUTES (ordre de présentation) ===\n";
+  for (var pos = 0; pos < DISPLAY_ORDER.length; pos++) {
+    var id = DISPLAY_ORDER[pos];
+    var rep = (answers[id] === null) ? "— (non répondu, commenté)" : String(answers[id] + 1);
+    body += "Q" + (pos + 1 < 10 ? "0" : "") + (pos + 1) + " : " + rep + (ITEMS[id].inv ? " (inv)" : "") + "\n";
+  }
+
+  var flagged = [];
+  for (var pos2 = 0; pos2 < DISPLAY_ORDER.length; pos2++) {
+    var id2 = DISPLAY_ORDER[pos2];
+    if (diffNotes[id2]) flagged.push("Q" + (pos2 + 1) + " — « " + ITEMS[id2].t + " » : " + diffNotes[id2]);
+  }
+  body += "\n=== ITEMS DIFFICILES À TRANCHER (signalés par la personne) ===\n";
+  body += flagged.length ? flagged.join("\n") : "(aucun item signalé)";
+  body += "\n";
+
+  // ----- lien mailto pré-rempli vers la praticienne -----
+  var subject = encodeURIComponent("Profil structurel — " + name + (date ? " — " + date : ""));
+  var mailto = "mailto:" + encodeURIComponent(PRACTICIEN_EMAIL) + "?subject=" + subject + "&body=" + encodeURIComponent(body);
+  document.getElementById("mailtoLink").href = mailto;
+
+  // ----- affichage de la confirmation -----
+  var sm = document.getElementById("successMsg");
+  sm.classList.add("visible");
+  sm.scrollIntoView({ behavior: "smooth", block: "center" });
+}
+
+</script>
+</body>
+</html>
