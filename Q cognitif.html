@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Questionnaire cognitif</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Arial, Helvetica, sans-serif; font-size: 15px; line-height: 1.6; color: #1a1a1a; background: #f5f3f0; padding: 20px; }
+  .container { max-width: 840px; margin: 0 auto; background: #fff; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,.08); overflow: hidden; }
+  .header { background: #3B6D11; color: #fff; padding: 32px 40px 26px; }
+  .header h1 { font-size: 22px; font-weight: 600; margin-bottom: 4px; }
+  .header .subtitle { font-size: 13.5px; opacity: .9; margin-top: 6px; font-style: italic; }
+  .header .author { font-size: 13px; opacity: .8; margin-top: 10px; }
+  .intro-box { background: #EAF3DE; border-left: 4px solid #639922; margin: 24px 40px 0; padding: 16px 20px; border-radius: 6px; font-size: 13.5px; color: #173404; line-height: 1.7; }
+  .intro-box strong.t { display: block; font-size: 13px; font-weight: 700; color: #3B6D11; margin-bottom: 6px; text-transform: uppercase; letter-spacing: .04em; }
+  .intro-box ul { margin: 8px 0 0 18px; }
+  .intro-box li { margin-bottom: 5px; }
+  .intro-box em { font-style: normal; font-weight: 700; color: #3B6D11; }
+  .idblock { padding: 20px 40px 0; display: flex; flex-wrap: wrap; gap: 14px; }
+  .idblock .fld { flex: 1; min-width: 200px; }
+  .idblock label { display: block; font-size: 12px; color: #555; margin-bottom: 4px; font-weight: 600; }
+  .idblock input { width: 100%; padding: 9px 11px; border: 1.5px solid #d8d8d4; border-radius: 7px; font-size: 14px; font-family: inherit; }
+  .idblock input:focus { outline: none; border-color: #639922; }
+  .completion-bar-wrap { background: #EAF3DE; border-radius: 20px; height: 8px; margin: 22px 40px 4px; overflow: hidden; }
+  .completion-bar { height: 100%; width: 0; background: #639922; border-radius: 20px; transition: width .3s; }
+  .completion-label { font-size: 12.5px; color: #555; margin: 0 40px 6px; }
+  .section { padding: 10px 40px 0; }
+  .qb { border: 1.5px solid #e8e8e4; border-left: 4px solid #e0e0dc; border-radius: 9px; padding: 15px 18px; margin-bottom: 14px; transition: border-color .2s, background .2s; }
+  .qb.done { border-left-color: #639922; background: #fcfdfb; }
+  .qb.flagged { border-left-color: #F9A825; }
+  .qb.miss { border-color: #d9534f; border-left-color: #d9534f; }
+  .qt { font-size: 14.5px; margin-bottom: 12px; }
+  .qt .qn { color: #3B6D11; font-weight: 700; margin-right: 6px; }
+  .pg { display: flex; gap: 8px; }
+  .po { flex: 1; }
+  .po input { position: absolute; opacity: 0; }
+  .po label { display: block; text-align: center; padding: 9px 4px; border: 1.5px solid #d8d8d4; border-radius: 7px; cursor: pointer; font-size: 12px; color: #555; transition: all .15s; min-height: 100%; }
+  .po label .pnum { display: block; font-size: 16px; font-weight: 700; color: #3B6D11; margin-bottom: 2px; }
+  .po input:checked + label { background: #3B6D11; border-color: #3B6D11; color: #fff; }
+  .po input:checked + label .pnum { color: #fff; }
+  .po label:hover { border-color: #639922; }
+  .diff { margin-top: 10px; }
+  .diff-toggle { font-size: 12px; color: #8a8a82; cursor: pointer; text-decoration: underline dotted; }
+  .diff-toggle:hover { color: #3B6D11; }
+  .diff-zone { display: none; margin-top: 8px; }
+  .diff-zone.open { display: block; }
+  .diff-zone textarea { width: 100%; min-height: 46px; padding: 8px 10px; border: 1.5px solid #F9A825; border-radius: 7px; font-size: 13px; font-family: inherit; resize: vertical; }
+  .submit-section { padding: 8px 40px 34px; }
+  .btn { display: inline-block; background: #3B6D11; color: #fff; padding: 13px 30px; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; border: none; font-family: inherit; }
+  .btn:hover { background: #639922; }
+  .warning-msg { background: #FFF8E1; border: 1.5px solid #F9A825; border-radius: 8px; padding: 12px 16px; color: #5D4037; font-size: 13.5px; margin-top: 14px; display: none; }
+  .success-msg { display: none; background: #EAF3DE; border: 1.5px solid #639922; border-radius: 8px; padding: 20px 24px; color: #173404; font-size: 14px; margin-top: 16px; line-height: 1.65; }
+  .success-msg.visible { display: block; }
+  .success-msg h3 { font-size: 16px; margin-bottom: 8px; color: #27500A; }
+  .success-msg .step { margin: 10px 0; }
+  .success-msg .btn-copy, .success-msg .btn-mailto { margin: 8px 8px 0 0; }
+  .btn-mailto { display: inline-block; padding: 12px 24px; background: #3B6D11; color: #fff; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px; }
+  .btn-mailto:hover { background: #639922; }
+  .copy-confirm { display: none; margin-top: 10px; padding: 9px 13px; background: #fff; border: 1px solid #639922; border-radius: 7px; font-size: 13px; color: #27500A; }
+  .cloture { background: #f7f6f3; border-radius: 8px; margin: 4px 40px 0; padding: 16px 20px; font-size: 13px; color: #555; line-height: 1.6; }
+  @media (max-width: 600px) {
+    body { padding: 8px; }
+    .header, .section, .submit-section, .idblock { padding-left: 18px; padding-right: 18px; }
+    .intro-box, .completion-bar-wrap, .completion-label, .cloture { margin-left: 18px; margin-right: 18px; }
+    .po label { font-size: 10.5px; padding: 8px 2px; }
+    .po label .pnum { font-size: 15px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>Questionnaire cognitif</h1>
+    <div class="subtitle">L'architecture de votre fonctionnement intellectuel : comment vous pensez, traitez l'information et déployez votre intelligence</div>
+    <div class="author">Marine Lefebvre — Psychologue</div>
+  </div>
+
+  <div class="intro-box">
+    <strong class="t">À lire avant de répondre</strong>
+    Ce questionnaire explore votre fonctionnement <em>habituel</em> — votre façon spontanée et durable de penser, pas votre état d'un jour particulier. Il ne mesure ni votre niveau, ni votre valeur : il décrit comment votre intelligence fonctionne.
+    <ul>
+      <li>Répondez selon ce qui vous correspond le plus souvent, pas selon ce que vous pensez devoir être.</li>
+      <li>Il n'y a pas de réponse neutre, et c'est volontaire : même si aucune n'est parfaite, essayez de pencher d'un côté.</li>
+      <li>Si un énoncé vous a vraiment posé problème à trancher, cliquez sur <em>« difficile à choisir ? »</em> sous l'énoncé et dites en un mot pourquoi. Cette hésitation est une information précieuse.</li>
+    </ul>
+  </div>
+
+  <div class="idblock">
+    <div class="fld"><label for="pName">Nom / identifiant</label><input type="text" id="pName" placeholder="Votre nom ou un identifiant"></div>
+    <div class="fld"><label for="pDate">Date</label><input type="date" id="pDate"></div>
+  </div>
+
+  <div class="completion-bar-wrap"><div class="completion-bar" id="pBar"></div></div>
+  <div class="completion-label" id="pLabel">0 / 77 question(s) traitée(s)</div>
+
+  <div class="section" id="qContainer"></div>
+
+  <div class="cloture">
+    Merci d'avoir complété ce questionnaire. Vos réponses seront lues dans une vision d'ensemble, en tenant compte de votre fonctionnement habituel et non de situations ponctuelles.
+  </div>
+
+  <div class="submit-section">
+    <button class="btn" id="btnValider" onclick="valider()">✉ Valider et envoyer mes résultats</button>
+    <div class="warning-msg" id="wMsg"></div>
+    <div class="success-msg" id="sMsg">
+      <h3>✓ Questionnaire complété</h3>
+      <div class="step">Vos réponses sont prêtes. Cliquez ci-dessous pour ouvrir votre messagerie et les envoyer à votre praticienne.</div>
+      <a class="btn-mailto" id="mailtoLink" href="#">✉ Ouvrir ma messagerie</a>
+    </div>
+  </div>
+</div>
+
+<script>
+var ITEMS = [{"id": 1, "dim": "style", "facet": null, "t": "Face à une situation, je saisis d'abord le sens d'ensemble et les liens avant d'en examiner les détails.", "inv": false, "desc": false}, {"id": 2, "dim": "style", "facet": null, "t": "Pour comprendre quelque chose, j'ai besoin de m'appuyer sur des éléments concrets et observables.", "inv": true, "desc": false}, {"id": 3, "dim": "style", "facet": null, "t": "Je me fie volontiers à mes intuitions et à mes impressions globales, même sans pouvoir encore les justifier point par point.", "inv": false, "desc": false}, {"id": 4, "dim": "style", "facet": null, "t": "Je suis plus à l'aise avec des faits précis et tangibles qu'avec des idées abstraites ou des hypothèses générales.", "inv": true, "desc": false}, {"id": 5, "dim": "structure", "facet": null, "t": "Ma pensée fonctionne par ramifications : une idée en appelle d'autres, qui se connectent spontanément.", "inv": false, "desc": false}, {"id": 6, "dim": "structure", "facet": null, "t": "Je peux tenir plusieurs idées ou niveaux de réflexion en même temps, sans les traiter l'un après l'autre.", "inv": false, "desc": false}, {"id": 7, "dim": "structure", "facet": null, "t": "Je pense de façon ordonnée et séquentielle, une étape après l'autre.", "inv": true, "desc": false}, {"id": 8, "dim": "structure", "facet": null, "t": "Mes raisonnements suivent un fil unique, du point de départ jusqu'à la conclusion.", "inv": true, "desc": false}, {"id": 9, "dim": "formes", "facet": "lm", "t": "Je suis à l'aise avec le raisonnement logique, formel ou mathématique, même en dehors d'un cadre scolaire.", "inv": false, "desc": false}, {"id": 10, "dim": "formes", "facet": "lm", "t": "Je perçois facilement les structures, les systèmes et les régularités dans ce que j'observe.", "inv": false, "desc": false}, {"id": 11, "dim": "formes", "facet": "la", "t": "Le langage — précision des mots, nuances, formulations — est un domaine où je me sens particulièrement à l'aise.", "inv": false, "desc": false}, {"id": 12, "dim": "formes", "facet": "la", "t": "J'aime jouer avec les mots, les métaphores et les analogies.", "inv": false, "desc": false}, {"id": 13, "dim": "formes", "facet": "sp", "t": "Je me repère sans effort dans l'espace et je visualise des plans ou des structures à trois dimensions.", "inv": false, "desc": false}, {"id": 14, "dim": "formes", "facet": "sp", "t": "Je manipule mentalement des formes ou des objets dans l'espace avec aisance.", "inv": false, "desc": false}, {"id": 15, "dim": "formes", "facet": "ex", "t": "Les grandes questions existentielles, philosophiques ou spirituelles m'occupent naturellement et durablement.", "inv": false, "desc": false}, {"id": 16, "dim": "formes", "facet": "ex", "t": "Je cherche le sens profond ou les principes derrière les choses, au-delà de leur utilité immédiate.", "inv": false, "desc": false}, {"id": 17, "dim": "formes", "facet": "ip", "t": "Je saisis rapidement ce qui se joue entre les personnes — leurs intentions, leurs rôles, les rapports de force.", "inv": false, "desc": false}, {"id": 18, "dim": "formes", "facet": "ip", "t": "Je comprends les ressorts d'une personne — ce qui la motive, ce qui la freine — souvent avant qu'elle ne les formule.", "inv": false, "desc": false}, {"id": 19, "dim": "formes", "facet": "ia", "t": "J'ai une compréhension fine de mon propre fonctionnement : mes réactions, mes besoins, mes mécanismes intérieurs.", "inv": false, "desc": false}, {"id": 20, "dim": "formes", "facet": "ia", "t": "Je perçois clairement mes motivations profondes, mes valeurs et ce qui m'anime vraiment.", "inv": false, "desc": false}, {"id": 21, "dim": "medium", "facet": "ve", "t": "Quand je réfléchis, ma pensée prend la forme de mots — une voix intérieure qui formule en continu.", "inv": false, "desc": false}, {"id": 22, "dim": "medium", "facet": "ve", "t": "J'ai besoin de mettre les choses en mots pour qu'elles deviennent claires dans mon esprit.", "inv": false, "desc": false}, {"id": 23, "dim": "medium", "facet": "vi", "t": "Quand je réfléchis, je vois des images mentales, des scènes ou des représentations visuelles.", "inv": false, "desc": false}, {"id": 24, "dim": "medium", "facet": "vi", "t": "Je comprends et je retiens mieux quand je peux me représenter les choses visuellement.", "inv": false, "desc": false}, {"id": 25, "dim": "medium", "facet": "sc", "t": "Je pense souvent sous forme de structures, de schémas ou de relations organisées dans l'espace.", "inv": false, "desc": false}, {"id": 26, "dim": "medium", "facet": "sc", "t": "J'organise naturellement les idées en cartes, en arborescences ou en diagrammes mentaux.", "inv": false, "desc": false}, {"id": 27, "dim": "medium", "facet": "co", "t": "Certaines idées se manifestent d'abord par des sensations corporelles, avant même d'être formulées.", "inv": false, "desc": false}, {"id": 28, "dim": "medium", "facet": "co", "t": "J'ai besoin de bouger, de manipuler ou de ressentir physiquement pour bien penser.", "inv": false, "desc": false}, {"id": 29, "dim": "medium", "facet": "am", "t": "Certaines de mes meilleures idées émergent sans forme définie, comme une impression globale qui se précise ensuite.", "inv": false, "desc": false}, {"id": 30, "dim": "medium", "facet": "am", "t": "Mon mode de pensée intérieur est difficile à décrire : il n'est ni vraiment verbal, ni vraiment visuel.", "inv": false, "desc": false}, {"id": 31, "dim": "metaflex", "facet": "meta", "t": "Je peux observer ma pensée pendant que je raisonne, et suivre comment je m'y prends.", "inv": false, "desc": false}, {"id": 32, "dim": "metaflex", "facet": "meta", "t": "Je remarque rarement les biais ou les ratés de mon propre raisonnement.", "inv": true, "desc": false}, {"id": 33, "dim": "metaflex", "facet": "meta", "t": "Je sais évaluer si ma façon d'aborder un problème est pertinente ou non.", "inv": false, "desc": false}, {"id": 34, "dim": "metaflex", "facet": "flex", "t": "Passer d'une activité, d'un sujet ou d'une idée à un autre se fait facilement chez moi.", "inv": false, "desc": false}, {"id": 35, "dim": "metaflex", "facet": "flex", "t": "Changer de cap en cours de route ne me pèse pas.", "inv": false, "desc": false}, {"id": 36, "dim": "metaflex", "facet": "flex", "t": "Quand je suis absorbé(e) dans quelque chose, j'ai du mal à m'arrêter avant d'être allé(e) au bout.", "inv": true, "desc": false}, {"id": 37, "dim": "memoire", "facet": null, "t": "Je mémorise sans effort ce que j'ai vraiment compris.", "inv": false, "desc": false}, {"id": 38, "dim": "memoire", "facet": null, "t": "J'apprends bien plus par les liens et la logique d'ensemble que par la répétition.", "inv": false, "desc": false}, {"id": 39, "dim": "memoire", "facet": null, "t": "Mes souvenirs s'organisent en réseaux de sens reliés entre eux, plutôt qu'en faits isolés.", "inv": false, "desc": false}, {"id": 40, "dim": "memoire", "facet": null, "t": "Je retiens facilement des informations même arbitraires ou dénuées de sens pour moi.", "inv": true, "desc": false}, {"id": 41, "dim": "memoire", "facet": null, "t": "Je mémorise des règles ou des procédures sans avoir besoin d'en comprendre la logique.", "inv": true, "desc": false}, {"id": 42, "dim": "curiosite", "facet": "appetit", "t": "Je cherche spontanément à approfondir ce qui m'intéresse, bien au-delà du nécessaire.", "inv": false, "desc": false}, {"id": 43, "dim": "curiosite", "facet": "appetit", "t": "Ma curiosité me porte vers des domaines variés, parfois très éloignés les uns des autres.", "inv": false, "desc": false}, {"id": 44, "dim": "curiosite", "facet": "appetit", "t": "Comprendre quelque chose de nouveau ou de complexe me procure un plaisir intense.", "inv": false, "desc": false}, {"id": 45, "dim": "curiosite", "facet": "appetit", "t": "L'inactivité intellectuelle ou l'ennui me sont difficiles à supporter.", "inv": false, "desc": false}, {"id": 46, "dim": "curiosite", "facet": "appetit", "t": "Apprendre ou comprendre pour le seul plaisir de savoir ne me motive pas particulièrement.", "inv": true, "desc": false}, {"id": 47, "dim": "curiosite", "facet": "recept", "t": "Je suis attiré(e) par les idées inhabituelles ou qui bousculent les façons de voir établies.", "inv": false, "desc": false}, {"id": 48, "dim": "curiosite", "facet": "recept", "t": "Je peux accueillir une idée nouvelle ou déroutante sans la rejeter ni la trancher trop vite.", "inv": false, "desc": false}, {"id": 49, "dim": "curiosite", "facet": "recept", "t": "Les idées qui s'écartent trop de ma façon de voir me mettent mal à l'aise.", "inv": true, "desc": false}, {"id": 50, "dim": "curiosite", "facet": "selectivite", "t": "Ma curiosité est sélective : je vais très loin sur ce qui m'accroche, et je survole ou laisse de côté le reste.", "inv": false, "desc": true}, {"id": 51, "dim": "creativite", "facet": "gen", "t": "Je génère facilement des idées nouvelles, des angles inattendus ou des solutions originales.", "inv": false, "desc": false}, {"id": 52, "dim": "creativite", "facet": "gen", "t": "J'aime inventer, combiner ou détourner pour créer quelque chose qui n'existait pas.", "inv": false, "desc": false}, {"id": 53, "dim": "creativite", "facet": "gen", "t": "Je préfère approfondir ce qui existe plutôt qu'inventer du nouveau.", "inv": true, "desc": false}, {"id": 54, "dim": "creativite", "facet": "flux", "t": "Il m'arrive d'entrer dans des états d'immersion totale où le temps s'efface et où je perds conscience de ce qui m'entoure.", "inv": false, "desc": false}, {"id": 55, "dim": "creativite", "facet": "flux", "t": "Je peux passer des heures sur ce qui me passionne sans voir le temps passer.", "inv": false, "desc": false}, {"id": 56, "dim": "creativite", "facet": "flux", "t": "Dès qu'un sujet me captive, je bascule assez facilement dans une immersion profonde.", "inv": false, "desc": false}, {"id": 57, "dim": "creativite", "facet": "prod", "t": "Je traduis régulièrement mes idées et ma vie intérieure en réalisations concrètes et abouties.", "inv": false, "desc": false}, {"id": 58, "dim": "creativite", "facet": "prod", "t": "Ma richesse intérieure reste surtout en dedans ; je la concrétise rarement.", "inv": true, "desc": false}, {"id": 59, "dim": "creativite", "facet": "prod", "t": "La phase d'exploration m'enthousiasme, mais j'ai du mal à aller jusqu'à la finalisation.", "inv": true, "desc": false}, {"id": 60, "dim": "couplage", "facet": null, "t": "Une idée qui me touche intellectuellement me touche aussi émotionnellement.", "inv": false, "desc": false}, {"id": 61, "dim": "couplage", "facet": null, "t": "Certaines idées déclenchent en moi un enthousiasme difficile à contenir.", "inv": false, "desc": false}, {"id": 62, "dim": "couplage", "facet": null, "t": "Les incohérences ou les erreurs de logique me dérangent autant que les injustices morales.", "inv": false, "desc": false}, {"id": 63, "dim": "couplage", "facet": null, "t": "La plupart du temps, réfléchir reste pour moi une activité posée, sans charge émotionnelle particulière.", "inv": true, "desc": false}, {"id": 64, "dim": "couplage", "facet": null, "t": "Penser, comprendre, élaborer ne me remue pas particulièrement.", "inv": true, "desc": false}, {"id": 65, "dim": "dyssync", "facet": "decalage", "t": "J'ai souvent eu l'impression de percevoir ou de comprendre les choses différemment des autres.", "inv": false, "desc": false}, {"id": 66, "dim": "dyssync", "facet": "decalage", "t": "Mes questionnements ou mes raisonnements trouvent rarement un écho dans mon entourage.", "inv": false, "desc": false}, {"id": 67, "dim": "dyssync", "facet": "decalage", "t": "Il m'est difficile de trouver des personnes ou des contextes où échanger au niveau de complexité qui me convient.", "inv": false, "desc": false}, {"id": 68, "dim": "dyssync", "facet": "decalage", "t": "Je me sens généralement en phase avec la façon dont les autres pensent et traitent l'information.", "inv": true, "desc": false}, {"id": 69, "dim": "dyssync", "facet": "cout", "t": "Il m'arrive de taire ou de simplifier ma pensée pour m'adapter à mon interlocuteur.", "inv": false, "desc": false}, {"id": 70, "dim": "dyssync", "facet": "cout", "t": "Quand je dois simplifier ou taire ma pensée pour m'adapter, cela me coûte : effort, fatigue ou insatisfaction.", "inv": false, "desc": false}, {"id": 71, "dim": "dyssync", "facet": "cout", "t": "Travailler « sous mon niveau », sans mobiliser mes ressources réelles, m'est difficile à supporter durablement.", "inv": false, "desc": false}, {"id": 72, "dim": "dyssync", "facet": "cout", "t": "Me sentir différent(e) dans ma façon de penser n'a pas entamé ma confiance en moi ni mon rapport à mon intelligence.", "inv": true, "desc": false}, {"id": 73, "dim": "dyssync", "facet": "cout", "t": "Avec le temps, mon intelligence est devenue davantage une ressource qu'une source de tension dans ma vie.", "inv": true, "desc": false}, {"id": 74, "dim": "attention", "facet": null, "t": "Mon attention fonctionne par hyperconcentration : quand un sujet me captive, je m'y absorbe intensément, au détriment du reste.", "inv": false, "desc": false}, {"id": 75, "dim": "attention", "facet": null, "t": "Je soutiens sans peine mon attention, même sur des tâches répétitives ou peu stimulantes.", "inv": true, "desc": false}, {"id": 76, "dim": "attention", "facet": null, "t": "J'atteins assez vite un point de saturation cognitive, même sans fatigue physique.", "inv": false, "desc": false}, {"id": 77, "dim": "attention", "facet": null, "t": "Pour tenir dans la durée, je fonctionne par alternance : des phases d'intensité mentale, puis des temps de récupération.", "inv": false, "desc": false}, {"id": 78, "dim": "attention", "facet": null, "t": "Je gère facilement les environnements cognitifs chargés : multitâche, interruptions, informations multiples.", "inv": true, "desc": false}];
+var DIMS = [{"key": "style", "label": "Style cognitif", "kind": "bipolar", "hi": "N — global / intuitif", "lo": "S — concret / factuel"}, {"key": "structure", "label": "Structure de la pensée", "kind": "bipolar", "hi": "arborescente", "lo": "linéaire"}, {"key": "formes", "label": "Formes d'intelligence", "kind": "profile", "regs": [["lm", "Logico-mathématique"], ["la", "Langagière"], ["sp", "Spatiale"], ["ex", "Existentielle / philosophique"], ["ip", "Interpersonnelle"], ["ia", "Intrapersonnelle"]]}, {"key": "medium", "label": "Médium de la pensée", "kind": "profile", "regs": [["ve", "Verbal"], ["vi", "Visuel"], ["sc", "Spatial / schématique"], ["co", "Corporel / kinesthésique"], ["am", "Amodal / intuitif"]]}, {"key": "metaflex", "label": "Métacognition & souplesse", "kind": "scale", "facets": [["meta", "Métacognition"], ["flex", "Souplesse / désengagement"]]}, {"key": "memoire", "label": "Mémoire & apprentissage", "kind": "scale", "facets": []}, {"key": "curiosite", "label": "Curiosité, appétit & réceptivité", "kind": "scale", "facets": [["appetit", "Appétit"], ["recept", "Réceptivité"]]}, {"key": "creativite", "label": "Créativité, production & flux", "kind": "scale", "facets": [["gen", "Génération"], ["flux", "Flux"], ["prod", "Production & achèvement"]]}, {"key": "couplage", "label": "Couplage émotion-cognition", "kind": "scale", "facets": []}, {"key": "dyssync", "label": "Dyssynchronie & coût adaptatif", "kind": "scale", "facets": [["decalage", "Décalage"], ["cout", "Coût adaptatif"]]}, {"key": "attention", "label": "Attention, MdT & seuils", "kind": "scale", "facets": []}];
+var ORDER = [1, 43, 13, 34, 48, 5, 49, 10, 53, 27, 21, 38, 17, 57, 0, 60, 67, 41, 28, 58, 29, 50, 32, 73, 35, 52, 4, 54, 70, 18, 66, 72, 39, 64, 7, 23, 76, 22, 26, 47, 63, 12, 19, 37, 8, 77, 62, 51, 61, 75, 31, 45, 65, 24, 69, 3, 2, 33, 46, 14, 9, 40, 42, 71, 20, 25, 30, 36, 15, 59, 6, 11, 68, 55, 44, 74, 56, 16];
+var PRACTICIEN_EMAIL = "lefebvremarine75@gmail.com"; // destinataire pré-rempli
+var TOTAL = ITEMS.length;
+var ans = {};        // id -> 1..4
+var diffNotes = {};  // id -> texte (un item commenté compte comme traité)
+var SUBS = ["Pas du tout vrai","Plutôt faux","Plutôt vrai","Tout à fait vrai"];
+
+document.getElementById("pDate").valueAsDate = new Date();
+
+// ---- render (ordre mélangé) -------------------------------------------------
+(function render() {
+  var c = document.getElementById("qContainer");
+  var hExtraColors = {}; // (placeholder)
+  for (var pos = 0; pos < ORDER.length; pos++) {
+    var idx = ORDER[pos];
+    var it = ITEMS[idx];
+    var id = it.id;
+    var disp = pos + 1;
+    var qb = document.createElement("div");
+    qb.className = "qb"; qb.id = "qb" + id;
+    var pg = "";
+    for (var v = 1; v <= 4; v++) {
+      pg += '<div class="po"><input type="radio" name="q'+id+'" id="q'+id+'_'+v+'" value="'+v+'" onchange="onAns('+id+','+v+')">'
+          + '<label for="q'+id+'_'+v+'"><span class="pnum">'+v+'</span>'+SUBS[v-1]+'</label></div>';
+    }
+    qb.innerHTML =
+      '<div class="qt"><span class="qn">'+disp+'.</span>'+it.t+'</div>'
+      + '<div class="pg">'+pg+'</div>'
+      + '<div class="diff">'
+      +   '<span class="diff-toggle" onclick="toggleDiff('+id+')">difficile à choisir ?</span>'
+      +   '<div class="diff-zone" id="dz'+id+'"><textarea id="dt'+id+'" placeholder="En un mot, qu\'est-ce qui rendait ce choix difficile ?" oninput="onDiff('+id+')"></textarea></div>'
+      + '</div>';
+    c.appendChild(qb);
+  }
+})();
+
+function treated(id){ return ans[id] !== undefined || (diffNotes[id] && diffNotes[id].length > 0); }
+function markState(id){
+  var qb = document.getElementById("qb"+id);
+  if (treated(id)) qb.classList.add("done"); else qb.classList.remove("done");
+  qb.classList.remove("miss");
+  if (diffNotes[id] && diffNotes[id].length > 0) qb.classList.add("flagged"); else qb.classList.remove("flagged");
+}
+function refresh(){
+  var n = 0;
+  for (var i = 0; i < ITEMS.length; i++){ if (treated(ITEMS[i].id)) n++; }
+  document.getElementById("pBar").style.width = Math.round(n/TOTAL*100)+"%";
+  document.getElementById("pLabel").textContent = n+" / "+TOTAL+" question(s) traitée(s)";
+}
+function onAns(id, v) { ans[id] = v; markState(id); refresh(); }
+function toggleDiff(id) { document.getElementById("dz"+id).classList.toggle("open"); }
+function onDiff(id) {
+  var t = document.getElementById("dt"+id).value.trim();
+  if (t) diffNotes[id] = t; else delete diffNotes[id];
+  markState(id); refresh();
+}
+
+// ---- export (réponses brutes uniquement — aucun calcul automatique) ---------
+function buildBody() {
+  var name = document.getElementById("pName").value.trim() || "non renseigné";
+  var date = document.getElementById("pDate").value || "";
+  var L = [];
+  L.push("QUESTIONNAIRE COGNITIF");
+  L.push("Participant(e) : "+name);
+  L.push("Date : "+date);
+  L.push("");
+  L.push("Échelle : 1=Pas du tout vrai  2=Plutôt faux  3=Plutôt vrai  4=Tout à fait vrai");
+  L.push("");
+  L.push("=== RÉPONSES (ordre de présentation) ===");
+  for (var pos = 0; pos < ORDER.length; pos++) {
+    var it = ITEMS[ORDER[pos]];
+    var n = (pos+1 < 10 ? "0" : "") + (pos+1);
+    L.push("Q"+n+" [#"+it.id+"] : "+(ans[it.id]!==undefined?ans[it.id]:"— (non répondu, commenté)")+(it.inv?" (inv)":""));
+  }
+  L.push("");
+  L.push("=== ITEMS DIFFICILES À TRANCHER (signalés par le participant) ===");
+  var flagged = [];
+  for (var p2 = 0; p2 < ORDER.length; p2++) {
+    var it2 = ITEMS[ORDER[p2]];
+    if (diffNotes[it2.id]) flagged.push("Q"+(p2+1)+" — « "+it2.t+" » : "+diffNotes[it2.id]);
+  }
+  L.push(flagged.length ? flagged.join("\n") : "(aucun)");
+  return L.join("\n");
+}
+
+function valider() {
+  document.getElementById("sMsg").classList.remove("visible");
+  var miss = [], first = null;
+  for (var i = 0; i < ORDER.length; i++) {
+    var it = ITEMS[ORDER[i]];
+    if (!treated(it.id)) {
+      miss.push(i+1);
+      document.getElementById("qb"+it.id).classList.add("miss");
+      if (first === null) first = it.id;
+    }
+  }
+  if (miss.length) {
+    var w = document.getElementById("wMsg");
+    w.style.display = "block";
+    w.innerHTML = miss.length+" question(s) à traiter (n° "+miss.slice(0,8).join(", ")+(miss.length>8?"…":"")+"). Pour chacune, choisissez une réponse <em>ou</em>, si vous ne pouvez pas trancher, cliquez sur « difficile à choisir » et indiquez pourquoi.";
+    alert("Il reste "+miss.length+" question(s) à traiter. Cliquez sur OK pour aller à la première.");
+    if (first) document.getElementById("qb"+first).scrollIntoView({behavior:"smooth", block:"center"});
+    return;
+  }
+  document.getElementById("wMsg").style.display = "none";
+
+  var body = buildBody();
+  var name = document.getElementById("pName").value.trim();
+  var date = document.getElementById("pDate").value || "";
+  var subj = "Questionnaire cognitif — " + (name || "résultats") + (date ? " — "+date : "");
+  document.getElementById("mailtoLink").href =
+    "mailto:"+encodeURIComponent(PRACTICIEN_EMAIL)+"?subject="+encodeURIComponent(subj)+"&body="+encodeURIComponent(body);
+  document.getElementById("sMsg").classList.add("visible");
+  document.getElementById("sMsg").scrollIntoView({behavior:"smooth", block:"start"});
+}
+</script>
+</body>
+</html>
